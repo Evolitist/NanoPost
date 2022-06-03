@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "944649400932",
+    "project_id": "nano-post",
+    "storage_bucket": "nano-post.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:944649400932:android:5a78acbfaf636c5bfb2571",
+        "android_client_info": {
+          "package_name": "com.evolitist.nanopost"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "944649400932-32hq5cph901fq0sj1cssasn08avaum9b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDms1gSEDoLZ5pKrftqEw6n0dV7pxogpTs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "944649400932-32hq5cph901fq0sj1cssasn08avaum9b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:944649400932:android:14ff6cfb3735739efb2571",
+        "android_client_info": {
+          "package_name": "com.headsimprove.nanopost"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "944649400932-32hq5cph901fq0sj1cssasn08avaum9b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDms1gSEDoLZ5pKrftqEw6n0dV7pxogpTs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "944649400932-32hq5cph901fq0sj1cssasn08avaum9b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

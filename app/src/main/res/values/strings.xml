@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">NanoPost</string>
+
+    <string name="auth">Auth</string>
+    <string name="logout">Logout</string>
+    <string name="feed">Feed</string>
+    <string name="search">Search</string>
+    <string name="profile">Profile</string>
+    <string name="images">Images</string>
+    <string name="create">Create…</string>
+    <string name="create_post">New post</string>
+    <string name="create_profile">New profile</string>
+    <string name="post">Post</string>
+    <string name="image">Image</string>
+
+    <string name="username_validation_too_short">Username must be longer than 3 characters</string>
+    <string name="username_validation_too_long">Username must be shorter than 16 characters</string>
+    <string name="username_validation_malformed">Username can only contain lowercase letters, dots and underscores</string>
+</resources>
