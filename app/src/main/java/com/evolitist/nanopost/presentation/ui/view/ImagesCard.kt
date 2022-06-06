@@ -20,8 +20,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.evolitist.nanopost.R
 import com.evolitist.nanopost.domain.model.Image
 import com.evolitist.nanopost.presentation.extensions.ImmutableWrapper
 
@@ -48,7 +50,7 @@ fun ImagesCard(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
-                    text = "Images",
+                    text = stringResource(R.string.images),
                     modifier = Modifier.weight(1f),
                 )
                 Icon(
