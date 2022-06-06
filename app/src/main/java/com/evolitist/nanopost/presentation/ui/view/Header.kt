@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
@@ -50,6 +51,7 @@ fun Header(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier
             .padding(horizontal = 16.dp)
+            .clip(RoundedCornerShape(50))
             .clickable(enabled = onClick != null) {
                 clickHandler?.invoke()
             },
@@ -66,7 +68,7 @@ fun Header(
         )
         Column(
             verticalArrangement = Arrangement.spacedBy(style.textSpacing()),
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.padding(end = 16.dp),
         ) {
             Text(
                 text = profileName,

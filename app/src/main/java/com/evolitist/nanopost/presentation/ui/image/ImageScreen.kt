@@ -1,6 +1,7 @@
 package com.evolitist.nanopost.presentation.ui.image
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -49,6 +50,7 @@ fun ImageScreen(
     onCloseClick: () -> Unit,
 ) {
     var showBars by remember { mutableStateOf(true) }
+    val overlay = updateTransition(showBars, label = "Overlay transition")
     val image by viewModel.imageState
 
     LaunchedEffect(imageId) {
@@ -65,8 +67,8 @@ fun ImageScreen(
             }
 
             val scrimColor = MaterialTheme.colorScheme.surface.copy(alpha = .5f)
-            AnimatedVisibility(
-                visible = showBars,
+            overlay.AnimatedVisibility(
+                visible = { it },
                 enter = fadeIn(),
                 exit = fadeOut(),
                 modifier = Modifier.align(Alignment.TopCenter),
@@ -95,22 +97,29 @@ fun ImageScreen(
             }
 
             image?.let {
-                AnimatedVisibility(
-                    visible = showBars,
+                overlay.AnimatedVisibility(
+                    visible = { it },
                     enter = fadeIn(),
                     exit = fadeOut(),
                     modifier = Modifier.align(Alignment.BottomCenter),
                 ) {
-                    Header(
-                        style = HeaderStyle.Post,
-                        profile = it.owner,
-                        subtitle = { Text(SimpleDateFormat.getDateTimeInstance().format(it.dateCreated)) },
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(scrimColor)
                             .padding(top = 16.dp)
                             .windowInsetsPadding(WindowInsets.safeContent.only(WindowInsetsSides.Bottom)),
-                    )
+                    ) {
+                        val dateCreated = remember(it.dateCreated) {
+                            SimpleDateFormat.getDateTimeInstance().format(it.dateCreated)
+                        }
+
+                        Header(
+                            style = HeaderStyle.Post,
+                            profile = it.owner,
+                            subtitle = { Text(dateCreated) },
+                        )
+                    }
                 }
             }
         }

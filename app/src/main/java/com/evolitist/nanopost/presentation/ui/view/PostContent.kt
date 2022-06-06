@@ -34,12 +34,15 @@ fun PostContent(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier.padding(top = 16.dp, bottom = if (post.images.isEmpty()) 16.dp else 0.dp),
     ) {
+        val dateCreated = remember(post.dateCreated) {
+            SimpleDateFormat.getDateTimeInstance().format(post.dateCreated)
+        }
+
         Header(
             style = HeaderStyle.Post,
             profile = post.owner,
-            subtitle = { Text(SimpleDateFormat.getDateTimeInstance().format(post.dateCreated)) },
+            subtitle = { Text(dateCreated) },
             onClick = { onHeaderClick(post.owner.id) },
-            modifier = Modifier.fillMaxWidth(),
         )
 
         if (!post.text.isNullOrEmpty()) {

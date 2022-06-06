@@ -1,6 +1,5 @@
 package com.evolitist.nanopost.presentation.service
 
-import android.util.Log
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -23,11 +22,9 @@ class NotificationService : FirebaseMessagingService() {
     }
 
     override fun onNewToken(token: String) {
-        Log.d("PushToken", token)
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
-        Log.d("Push", "Got message")
         message.notification?.let {
             val notification = NotificationCompat.Builder(this, POSTS_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
