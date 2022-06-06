@@ -9,13 +9,13 @@ plugins {
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 32
     //compileSdkPreview = "Tiramisu"
 
     defaultConfig {
         applicationId = "com.evolitist.nanopost"
         minSdk = 21
-        targetSdk = 31
+        targetSdk = 32
         //targetSdkPreview = "Tiramisu"
         versionCode = 1
         versionName = "1.0"
@@ -51,7 +51,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.2.0-beta02"
+        kotlinCompilerExtensionVersion = "1.2.0-beta03"
     }
 }
 
@@ -63,14 +63,14 @@ dependencies {
     // UI
     implementation("androidx.core:core-splashscreen:1.0.0-rc01")
 
-    val composeVersion = "1.2.0-beta02"
+    val composeVersion = "1.2.0-beta03"
     implementation("androidx.compose.animation:animation:$composeVersion")
     implementation("androidx.compose.foundation:foundation:$composeVersion")
     implementation("androidx.compose.material:material:$composeVersion")
     implementation("androidx.compose.material:material-icons-extended:$composeVersion")
     implementation("androidx.compose.ui:ui:$composeVersion")
 
-    val accompanistVersion = "0.24.9-beta"
+    val accompanistVersion = "0.24.10-beta"
     implementation("com.google.accompanist:accompanist-navigation-animation:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-navigation-material:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-pager:$accompanistVersion")
@@ -79,8 +79,8 @@ dependencies {
     implementation("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
 
-    implementation("androidx.compose.material3:material3:1.0.0-alpha12")
-    implementation("io.github.fornewid:material-motion-compose-core:0.9.0-beta02")
+    implementation("androidx.compose.material3:material3:1.0.0-alpha13")
+    implementation("io.github.fornewid:material-motion-compose-core:0.9.0-beta03")
     implementation("io.coil-kt:coil-compose:2.0.0")
 
     // Architecture & navigation
@@ -106,7 +106,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
 
     // Paging
-    implementation("androidx.paging:paging-compose:1.0.0-alpha14")
+    implementation("androidx.paging:paging-compose:1.0.0-alpha15")
 
     // Background tasks
     implementation("androidx.work:work-runtime-ktx:2.7.1")
@@ -114,7 +114,7 @@ dependencies {
     kapt("androidx.hilt:hilt-compiler:1.0.0")
 
     // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:30.0.1"))
+    implementation(platform("com.google.firebase:firebase-bom:30.1.0"))
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-messaging-ktx")
 

@@ -270,8 +270,8 @@ private fun SingleRowTopAppBar(
     // Set a scroll offset limit to hide the entire app bar area when scrolling.
     val offsetLimit = with(LocalDensity.current) { -64.dp.toPx() }
     SideEffect {
-        if (scrollBehavior?.offsetLimit != offsetLimit) {
-            scrollBehavior?.offsetLimit = offsetLimit
+        if (scrollBehavior?.state?.offsetLimit != offsetLimit) {
+            scrollBehavior?.state?.offsetLimit = offsetLimit
         }
     }
 
@@ -294,7 +294,7 @@ private fun SingleRowTopAppBar(
     // scroll-state offset.
     Surface(modifier = modifier, color = appBarContainerColor) {
         val height = LocalDensity.current.run {
-            64.dp.toPx() + (scrollBehavior?.offset ?: 0f)
+            64.dp.toPx() + (scrollBehavior?.state?.offset ?: 0f)
         }
         TopAppBarLayout(
             modifier = Modifier.padding(contentPadding),
@@ -355,16 +355,16 @@ private fun TwoRowsTopAppBar(
     // Set a scroll offset limit that will hide just the title area and will keep the small title
     // area visible.
     SideEffect {
-        if (scrollBehavior?.offsetLimit != pinnedHeightPx - maxHeightPx) {
-            scrollBehavior?.offsetLimit = pinnedHeightPx - maxHeightPx
+        if (scrollBehavior?.state?.offsetLimit != pinnedHeightPx - maxHeightPx) {
+            scrollBehavior?.state?.offsetLimit = pinnedHeightPx - maxHeightPx
         }
     }
 
     val scrollPercentage =
-        if (scrollBehavior == null || scrollBehavior.offsetLimit == 0f) {
+        if (scrollBehavior == null || scrollBehavior.state.offsetLimit == 0f) {
             0f
         } else {
-            scrollBehavior.offset / scrollBehavior.offsetLimit
+            scrollBehavior.state.offset / scrollBehavior.state.offsetLimit
         }
 
     // Obtain the container Color from the TopAppBarColors.
@@ -411,7 +411,7 @@ private fun TwoRowsTopAppBar(
             )
             TopAppBarLayout(
                 modifier = Modifier.clipToBounds(),
-                heightPx = maxHeightPx - pinnedHeightPx + (scrollBehavior?.offset ?: 0f),
+                heightPx = maxHeightPx - pinnedHeightPx + (scrollBehavior?.state?.offset ?: 0f),
                 navigationIconContentColor = colors.navigationIconContentColor(scrollFraction).value,
                 titleContentColor = colors.titleContentColor(scrollFraction).value,
                 actionIconContentColor = colors.actionIconContentColor(scrollFraction).value,
