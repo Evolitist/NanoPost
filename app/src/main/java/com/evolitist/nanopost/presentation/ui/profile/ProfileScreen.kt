@@ -53,14 +53,13 @@ fun ProfileScreen(
     onProfileClick: (String) -> Unit,
 ) {
     val data = viewModel.profilePagingItems
+    val swipeRefreshState = rememberSwipeRefreshState(
+        data.loadState.refresh == LoadState.Loading
+    )
 
     LaunchedEffect(profileId) {
         viewModel.setProfileId(profileId)
     }
-
-    val swipeRefreshState = rememberSwipeRefreshState(
-        data.loadState.refresh == LoadState.Loading
-    )
 
     val topAppBarState = rememberTopAppBarScrollState()
     val scrollBehavior = remember(topAppBarState) {

@@ -58,7 +58,7 @@ fun PostScreen(
                     DropdownMenuIconButton {
                         DropdownMenuItem(
                             leadingIcon = { Icon(Icons.Rounded.Delete, contentDescription = null) },
-                            text = { Text("Delete") },
+                            text = { Text(stringResource(R.string.action_delete)) },
                             onClick = { viewModel.onDeleteClick(postId, onCloseClick) },
                         )
                     }

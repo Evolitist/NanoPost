@@ -43,8 +43,10 @@ fun FeedScreen(
     onProfileClick: (String) -> Unit,
     onImageClick: (String) -> Unit,
 ) {
-    val items = viewModel.feedPagingItems
-    val swipeRefreshState = rememberSwipeRefreshState(items.loadState.refresh == LoadState.Loading)
+    val data = viewModel.feedPagingItems
+    val swipeRefreshState = rememberSwipeRefreshState(
+        data.loadState.refresh == LoadState.Loading
+    )
 
     val topAppBarState = rememberTopAppBarScrollState()
     val scrollBehavior = remember(topAppBarState) {
@@ -88,7 +90,7 @@ fun FeedScreen(
     ) { padding ->
         SwipeRefresh(
             state = swipeRefreshState,
-            onRefresh = items::refresh,
+            onRefresh = data::refresh,
             modifier = Modifier.padding(padding),
         ) {
             LazyColumn(
@@ -98,7 +100,10 @@ fun FeedScreen(
                     .fillMaxSize()
                     .nestedScroll(scrollBehavior.nestedScrollConnection),
             ) {
-                items(items, key = { it.id }) { post ->
+                items(
+                    items = data,
+                    key = { it.id },
+                ) { post ->
                     post?.let {
                         PostCard(
                             post = it,

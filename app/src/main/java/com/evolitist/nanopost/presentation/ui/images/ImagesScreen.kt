@@ -44,14 +44,13 @@ fun ImagesScreen(
     onImageClick: (String) -> Unit,
 ) {
     val data = viewModel.imagesPagingItems
+    val swipeRefreshState = rememberSwipeRefreshState(
+        data.loadState.refresh == LoadState.Loading
+    )
 
     LaunchedEffect(profileId) {
         viewModel.setProfileId(profileId)
     }
-
-    val swipeRefreshState = rememberSwipeRefreshState(
-        data.loadState.refresh == LoadState.Loading
-    )
 
     val topAppBarState = rememberTopAppBarScrollState()
     val scrollBehavior = remember(topAppBarState) {
@@ -84,7 +83,10 @@ fun ImagesScreen(
                     .fillMaxSize()
                     .nestedScroll(scrollBehavior.nestedScrollConnection),
             ) {
-                items(data, key = { it.id }) { image ->
+                items(
+                    items = data,
+                    key = { it.id },
+                ) { image ->
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(1f)

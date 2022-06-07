@@ -33,9 +33,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.evolitist.nanopost.R
 import com.evolitist.nanopost.domain.model.Image
 import com.evolitist.nanopost.presentation.ui.view.CenterAlignedTopAppBar
 import com.evolitist.nanopost.presentation.ui.view.DropdownMenuIconButton
@@ -85,7 +87,7 @@ fun ImageScreen(
                         DropdownMenuIconButton {
                             DropdownMenuItem(
                                 leadingIcon = { Icon(Icons.Rounded.Delete, contentDescription = null) },
-                                text = { Text("Delete") },
+                                text = { Text(stringResource(R.string.action_delete)) },
                                 onClick = { viewModel.onDeleteClick(imageId, onCloseClick) },
                             )
                         }

@@ -16,4 +16,19 @@
     <string name="username_validation_too_short">Username must be longer than 3 characters</string>
     <string name="username_validation_too_long">Username must be shorter than 16 characters</string>
     <string name="username_validation_malformed">Username can only contain lowercase letters, dots and underscores</string>
+
+    <string name="action_retry">Retry</string>
+    <string name="action_delete">Delete</string>
+
+    <string name="auth_hint_username">Username</string>
+    <string name="auth_hint_password">Password</string>
+
+    <string name="auth_action_continue">Continue</string>
+    <string name="auth_action_sign_in">Sign In</string>
+    <string name="auth_action_register">Register</string>
+    <string name="auth_action_loading">Loading…</string>
+
+    <string name="auth_error_username_too_short">Username must be longer than 3 characters</string>
+    <string name="auth_error_username_too_long">Username must not be longer than 16 characters</string>
+    <string name="auth_error_username_invalid_characters">Username can only contain lowercase letters, dots and underscores</string>
 </resources>

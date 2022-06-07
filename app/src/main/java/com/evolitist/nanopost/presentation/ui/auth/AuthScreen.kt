@@ -82,18 +82,17 @@ fun AuthScreen(
 
             val isError = validationState != null
             val errorMessage = when (validationState) {
-                UsernameCheckResult.TooShort -> "Username must be longer than 3 characters"
-                UsernameCheckResult.TooLong -> "Username must not be longer than 16 characters"
-                UsernameCheckResult.InvalidCharacters -> "Username can only contain lowercase letters, dots and underscores"
+                UsernameCheckResult.TooShort -> stringResource(R.string.auth_error_username_too_short)
+                UsernameCheckResult.TooLong -> stringResource(R.string.auth_error_username_too_long)
+                UsernameCheckResult.InvalidCharacters -> stringResource(R.string.auth_error_username_invalid_characters)
                 else -> null
             }
-
 
             HelperTextField(
                 value = username,
                 onValueChange = { username = it },
                 singleLine = true,
-                label = { Text("Username") },
+                label = { Text(stringResource(R.string.auth_hint_username)) },
                 helper = { Text(errorMessage.orEmpty()) },
                 showHelper = isError,
                 keyboardOptions = KeyboardOptions(
@@ -118,7 +117,7 @@ fun AuthScreen(
                     value = password,
                     onValueChange = { password = it },
                     singleLine = true,
-                    label = { Text("Password") },
+                    label = { Text(stringResource(R.string.auth_hint_password)) },
                     keyboardOptions = KeyboardOptions(
                         autoCorrect = false,
                         keyboardType = KeyboardType.Password,
@@ -165,10 +164,10 @@ fun AuthScreen(
 @Composable
 private fun AuthButtonText(state: AuthScreenState) {
     when (state) {
-        AuthScreenState.CheckUsername -> Text("Continue")
-        AuthScreenState.SignIn -> Text("Sign In")
-        AuthScreenState.Register -> Text("Register")
-        is AuthScreenState.Loading -> Text("Loading...")
+        AuthScreenState.CheckUsername -> Text(stringResource(R.string.auth_action_continue))
+        AuthScreenState.SignIn -> Text(stringResource(R.string.auth_action_sign_in))
+        AuthScreenState.Register -> Text(stringResource(R.string.auth_action_register))
+        is AuthScreenState.Loading -> Text(stringResource(R.string.auth_action_loading))
         is AuthScreenState.Error<*> -> AuthButtonText(state.previousState)
     }
 }
