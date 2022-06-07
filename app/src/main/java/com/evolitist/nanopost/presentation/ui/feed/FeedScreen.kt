@@ -27,6 +27,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.items
 import com.evolitist.nanopost.R
+import com.evolitist.nanopost.presentation.extensions.loadState
 import com.evolitist.nanopost.presentation.ui.create.CreateActions
 import com.evolitist.nanopost.presentation.ui.view.CenterAlignedTopAppBar
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -114,6 +115,8 @@ fun FeedScreen(
                         )
                     }
                 }
+
+                loadState(data.loadState.append, data::retry)
             }
         }
     }

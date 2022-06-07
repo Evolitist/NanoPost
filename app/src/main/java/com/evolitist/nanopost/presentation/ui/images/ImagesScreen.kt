@@ -32,6 +32,7 @@ import androidx.paging.LoadState
 import coil.compose.AsyncImage
 import com.evolitist.nanopost.R
 import com.evolitist.nanopost.presentation.extensions.items
+import com.evolitist.nanopost.presentation.extensions.loadState
 import com.evolitist.nanopost.presentation.ui.view.CenterAlignedTopAppBar
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -107,6 +108,8 @@ fun ImagesScreen(
                         }
                     }
                 }
+
+                loadState(data.loadState.append, data::retry)
             }
         }
     }

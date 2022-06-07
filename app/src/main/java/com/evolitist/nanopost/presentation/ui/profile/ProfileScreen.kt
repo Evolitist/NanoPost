@@ -30,6 +30,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import com.evolitist.nanopost.presentation.extensions.immutable
 import com.evolitist.nanopost.presentation.extensions.items
+import com.evolitist.nanopost.presentation.extensions.loadState
 import com.evolitist.nanopost.presentation.ui.create.CreateActions
 import com.evolitist.nanopost.presentation.ui.view.CenterAlignedTopAppBar
 import com.evolitist.nanopost.presentation.ui.view.ImagesCard
@@ -159,6 +160,8 @@ fun ProfileScreen(
                         else -> Unit
                     }
                 }
+
+                loadState(data.loadState.append, data::retry)
             }
         }
     }
