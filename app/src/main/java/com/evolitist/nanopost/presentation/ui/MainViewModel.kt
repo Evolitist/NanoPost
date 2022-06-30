@@ -19,7 +19,9 @@ class MainViewModel @Inject constructor(
     val appStatusFlow = checkAppStatusUseCase()
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    fun logout() = viewModelScope.launch {
-        logoutUseCase()
+    fun logout() {
+        viewModelScope.launch {
+            logoutUseCase()
+        }
     }
 }
