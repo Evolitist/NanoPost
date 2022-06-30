@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,7 +29,7 @@ fun PostContent(
     onImageClick: (String) -> Unit,
     onHeaderClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    imageCarousel: Boolean = false,
+    isStandalone: Boolean = true,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -46,15 +47,24 @@ fun PostContent(
         )
 
         if (!post.text.isNullOrEmpty()) {
-            Text(
-                text = post.text,
-                modifier = Modifier.padding(horizontal = 16.dp),
-            )
+            val text = @Composable {
+                Text(
+                    text = post.text,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+            }
+            if (isStandalone) {
+                SelectionContainer {
+                    text()
+                }
+            } else {
+                text()
+            }
         }
         if (post.images.isNotEmpty()) {
             val placeholderColor = MaterialTheme.colorScheme.surfaceVariant
             val placeholderPainter = remember { ColorPainter(placeholderColor) }
-            if (imageCarousel && post.images.size > 1) {
+            if (!isStandalone && post.images.size > 1) {
                 HorizontalPager(
                     count = post.images.size,
                     key = { post.images[it].id },

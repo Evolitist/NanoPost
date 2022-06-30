@@ -22,7 +22,7 @@ fun PostCard(
             post = post,
             onImageClick = onImageClick,
             onHeaderClick = onHeaderClick,
-            imageCarousel = true,
+            isStandalone = false,
             modifier = Modifier.fillMaxWidth(),
         )
     }
