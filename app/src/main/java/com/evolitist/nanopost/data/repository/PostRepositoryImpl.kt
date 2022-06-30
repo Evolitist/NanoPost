@@ -29,7 +29,7 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override fun getPosts(profileId: String): Flow<PagingData<Post>> {
-        return Pager(PagingConfig(2, enablePlaceholders = false)) {
+        return Pager(PagingConfig(20, enablePlaceholders = false)) {
             StringKeyedPagingSource { count, offset ->
                 apiService.getPosts(profileId, count, offset)
             }
