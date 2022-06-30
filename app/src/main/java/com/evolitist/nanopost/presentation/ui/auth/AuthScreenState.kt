@@ -2,6 +2,10 @@ package com.evolitist.nanopost.presentation.ui.auth
 
 sealed class AuthScreenState(val showPasswordField: Boolean) {
 
+    open fun loading(): AuthScreenState = Loading(success())
+    open fun success(): AuthScreenState = this
+    open fun error(error: Any): AuthScreenState = Error(success(), error)
+
     object CheckUsername : AuthScreenState(false)
     object SignIn : AuthScreenState(true)
     object Register : AuthScreenState(true)
@@ -10,27 +14,16 @@ sealed class AuthScreenState(val showPasswordField: Boolean) {
         val previousState: AuthScreenState,
     ) : AuthScreenState(previousState.showPasswordField) {
         override fun loading(): AuthScreenState = this
-        override fun notLoading(): AuthScreenState = previousState
-        override fun <T> error(error: T): AuthScreenState = previousState.error(error)
+        override fun success(): AuthScreenState = previousState.success()
+        override fun error(error: Any): AuthScreenState = previousState.error(error)
     }
 
-    data class Error<T>(
+    data class Error(
         val previousState: AuthScreenState,
-        val error: T,
+        val error: Any,
     ) : AuthScreenState(previousState.showPasswordField) {
-
-        override val isError = true
-
         override fun loading(): AuthScreenState = previousState.loading()
-        override fun notLoading(): AuthScreenState = previousState.notLoading()
-        override fun <T> error(error: T): AuthScreenState = Error(previousState, error)
+        override fun success(): AuthScreenState = previousState.success()
+        override fun error(error: Any): AuthScreenState = Error(previousState.success(), error)
     }
-
-    open val isError = false
-
-    open fun loading(): AuthScreenState = Loading(this)
-
-    open fun notLoading(): AuthScreenState = this
-
-    open fun <T> error(error: T): AuthScreenState = Error(this, error)
 }

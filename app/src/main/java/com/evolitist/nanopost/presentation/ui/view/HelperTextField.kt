@@ -3,7 +3,6 @@ package com.evolitist.nanopost.presentation.ui.view
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.text.KeyboardActions
@@ -92,9 +91,4 @@ fun HelperTextField(
             }
         }
     }
-}
-
-@Composable
-fun ColumnScope.HelperText() {
-
 }

@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -14,9 +13,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,8 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.AutofillType
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -49,26 +50,37 @@ fun AuthScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val authState by viewModel.authScreenState
-    val validationState by viewModel.usernameValidation
 
     var username by rememberSaveable { mutableStateOf("") }
-    val usernameFocusRequester = remember { FocusRequester() }
     var password by rememberSaveable { mutableStateOf("") }
-    val passwordFocusRequester = remember { FocusRequester() }
 
-    fun tryFocus() {
-        /*if (authState == AuthState.CheckUsername) {
-            usernameFocusRequester.requestFocus()
-        } else {
-            passwordFocusRequester.requestFocus()
-        }*/
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(authState) {
+        authState.let {
+            if (it is AuthScreenState.Error && it.error is Exception) {
+                val snackbarResult = snackbarHostState.showSnackbar(
+                    message = it.error.localizedMessage.orEmpty(),
+                    actionLabel = "Retry",
+                )
+                if (snackbarResult == SnackbarResult.ActionPerformed) {
+                    viewModel.authButtonClick(username, password)
+                } else {
+                    viewModel.clearErrors()
+                }
+            }
+        }
     }
 
-    Scaffold { padding ->
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
+    ) { padding ->
         Column(
             modifier = Modifier
-                .padding(padding)
                 .fillMaxSize()
+                .padding(padding)
                 .padding(32.dp)
                 .imePadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
@@ -80,32 +92,33 @@ fun AuthScreen(
                 modifier = Modifier.padding(bottom = 32.dp),
             )
 
-            val isError = validationState != null
-            val errorMessage = when (validationState) {
-                UsernameCheckResult.TooShort -> stringResource(R.string.auth_error_username_too_short)
-                UsernameCheckResult.TooLong -> stringResource(R.string.auth_error_username_too_long)
-                UsernameCheckResult.InvalidCharacters -> stringResource(R.string.auth_error_username_invalid_characters)
-                else -> null
+            val errorMessage = (authState as? AuthScreenState.Error)?.let {
+                when (it.error) {
+                    UsernameCheckResult.TooShort -> stringResource(R.string.auth_error_username_too_short)
+                    UsernameCheckResult.TooLong -> stringResource(R.string.auth_error_username_too_long)
+                    UsernameCheckResult.InvalidCharacters -> stringResource(R.string.auth_error_username_invalid_characters)
+                    else -> null
+                }
             }
 
             HelperTextField(
                 value = username,
-                onValueChange = { username = it },
+                onValueChange = { username = it; viewModel.clearErrors() },
                 singleLine = true,
                 label = { Text(stringResource(R.string.auth_hint_username)) },
                 helper = { Text(errorMessage.orEmpty()) },
-                showHelper = isError,
+                showHelper = errorMessage != null,
                 keyboardOptions = KeyboardOptions(
+                    autoCorrect = false,
                     imeAction = ImeAction.Next,
                 ),
                 keyboardActions = KeyboardActions {
-                    viewModel.authButtonClick(username, password, ::tryFocus)
+                    viewModel.authButtonClick(username, password)
                 },
-                enabled = authState is AuthScreenState.CheckUsername,
-                isError = isError,
+                enabled = authState.success() is AuthScreenState.CheckUsername,
+                isError = errorMessage != null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .focusRequester(usernameFocusRequester)
                     .autofill(
                         autofillTypes = listOf(AutofillType.Username).immutable(),
                         onFill = { username = it },
@@ -115,7 +128,7 @@ fun AuthScreen(
             AnimatedVisibility(visible = authState.showPasswordField) {
                 TextField(
                     value = password,
-                    onValueChange = { password = it },
+                    onValueChange = { password = it; viewModel.clearErrors() },
                     singleLine = true,
                     label = { Text(stringResource(R.string.auth_hint_password)) },
                     keyboardOptions = KeyboardOptions(
@@ -124,13 +137,12 @@ fun AuthScreen(
                         imeAction = ImeAction.Done,
                     ),
                     keyboardActions = KeyboardActions {
-                        viewModel.authButtonClick(username, password, ::tryFocus)
+                        keyboardController?.hide()
+                        viewModel.authButtonClick(username, password)
                     },
                     visualTransformation = remember { PasswordVisualTransformation() },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 16.dp)
-                        .focusRequester(passwordFocusRequester)
                         .autofill(
                             autofillTypes = listOf(AutofillType.Password).immutable(),
                             onFill = { password = it },
@@ -149,9 +161,11 @@ fun AuthScreen(
                     if (authState.showPasswordField) {
                         keyboardController?.hide()
                     }
-                    viewModel.authButtonClick(username, password, ::tryFocus)
+                    viewModel.authButtonClick(username, password)
                 },
+                modifier = Modifier.padding(top = 16.dp),
             )
+            // TODO implement "non-authorized" mode
             /*OutlinedButton(
                 content = { Text("Skip") },
                 onClick = viewModel::skipButtonClick,
@@ -168,34 +182,6 @@ private fun AuthButtonText(state: AuthScreenState) {
         AuthScreenState.SignIn -> Text(stringResource(R.string.auth_action_sign_in))
         AuthScreenState.Register -> Text(stringResource(R.string.auth_action_register))
         is AuthScreenState.Loading -> Text(stringResource(R.string.auth_action_loading))
-        is AuthScreenState.Error<*> -> AuthButtonText(state.previousState)
-    }
-}
-
-@Composable
-fun ColumnScope.HelperText(
-    isError: Boolean,
-    helperText: String?,
-) {
-    val helperColor = if (isError) {
-        MaterialTheme.colorScheme.error
-    } else {
-        MaterialTheme.colorScheme.onSurfaceVariant
-    }
-    val helperStyle = if (isError) {
-        MaterialTheme.typography.labelMedium
-    } else {
-        MaterialTheme.typography.bodySmall
-    }
-
-    AnimatedVisibility(
-        visible = helperText != null,
-        modifier = Modifier.padding(start = 16.dp),
-    ) {
-        Text(
-            text = helperText.orEmpty(),
-            style = helperStyle,
-            color = helperColor,
-        )
+        is AuthScreenState.Error -> AuthButtonText(state.previousState)
     }
 }
