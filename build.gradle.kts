@@ -2,7 +2,7 @@ plugins {
     id("com.android.application") version "7.0.4" apply false
     id("com.android.library") version "7.0.4" apply false
 
-    val kotlinVersion = "1.6.21"
+    val kotlinVersion = "1.7.0"
     kotlin("android") version kotlinVersion apply false
     kotlin("plugin.serialization") version kotlinVersion apply false
 
