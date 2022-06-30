@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -74,7 +75,7 @@ enum class Screen(
     Image("image", R.string.image);
 
     companion object {
-        val hideNavigationBar = setOf(Auth, CreatePost, Image, Post)
+        val hideNavigationBar = setOf(Root, Auth, CreatePost, Image, Post)
         val bottomNavigationItems = mapOf(
             FeedGraph to Icons.Rounded.DynamicFeed,
             SearchGraph to Icons.Rounded.Search,
@@ -82,8 +83,10 @@ enum class Screen(
         )
     }
 
-    fun matches(route: String?): Boolean {
-        return route?.split("/", "?")?.first() == this.route
+    fun matches(destination: NavDestination?): Boolean {
+        return destination?.hierarchy?.any {
+            it.route?.split("/", "?")?.first { it.isNotEmpty() } == this.route
+        } == true
     }
 }
 
@@ -114,25 +117,24 @@ fun AppNavGraph() {
     ) {
         Scaffold(
             bottomBar = {
-                NavigationBar {
-                    val currentDestination = navBackStackEntry?.destination
-                    Screen.bottomNavigationItems.forEach { (screen, icon) ->
-                        NavigationBarItem(
-                            icon = { Icon(icon, contentDescription = null) },
-                            label = { Text(stringResource(screen.titleStringId)) },
-                            selected = currentDestination?.hierarchy?.any {
-                                it.route?.startsWith(screen.route) == true
-                            } == true,
-                            onClick = {
-                                navController.navigate(screen.route) {
-                                    popUpTo(Screen.NavGraph.route) {
-                                        saveState = true
+                if (Screen.hideNavigationBar.none { it.matches(navBackStackEntry?.destination) }) {
+                    NavigationBar {
+                        Screen.bottomNavigationItems.forEach { (screen, icon) ->
+                            NavigationBarItem(
+                                icon = { Icon(icon, contentDescription = null) },
+                                label = { Text(stringResource(screen.titleStringId)) },
+                                selected = screen.matches(navBackStackEntry?.destination),
+                                onClick = {
+                                    navController.navigate(screen.route) {
+                                        popUpTo(Screen.NavGraph.route) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                        )
+                                },
+                            )
+                        }
                     }
                 }
             }
