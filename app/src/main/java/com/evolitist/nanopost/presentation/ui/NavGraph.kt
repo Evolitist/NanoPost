@@ -1,7 +1,8 @@
 package com.evolitist.nanopost.presentation.ui
 
-import android.annotation.SuppressLint
 import androidx.annotation.StringRes
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -29,12 +30,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.dialog
-import androidx.navigation.compose.navigation
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.evolitist.nanopost.R
 import com.evolitist.nanopost.presentation.ui.auth.AuthScreen
@@ -48,6 +45,10 @@ import com.evolitist.nanopost.presentation.ui.profile.ProfileScreen
 import com.evolitist.nanopost.presentation.ui.view.AlertDialogContent
 import com.evolitist.nanopost.presentation.ui.view.ModalBottomSheetLayout
 import com.evolitist.nanopost.presentation.ui.view.NavigationBar
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.composable
+import com.google.accompanist.navigation.animation.navigation
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 
@@ -87,12 +88,11 @@ enum class Screen(
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun AppNavGraph() {
     val activityViewModel = hiltViewModel<MainViewModel>()
     val bottomSheetNavigator = rememberBottomSheetNavigator()
-    val navController = rememberNavController(bottomSheetNavigator)
+    val navController = rememberAnimatedNavController(bottomSheetNavigator)
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
     val authStatus by activityViewModel.appStatusFlow.collectAsState()
@@ -136,12 +136,14 @@ fun AppNavGraph() {
                     }
                 }
             }
-        ) { padding ->
-            NavHost(
+        ) { innerPadding ->
+            AnimatedNavHost(
                 navController = navController,
                 route = Screen.NavGraph.route,
                 startDestination = Screen.Root.route,
-                modifier = Modifier.padding(padding),
+                enterTransition = { EnterTransition.None },
+                exitTransition = { ExitTransition.None },
+                modifier = Modifier.padding(innerPadding),
             ) {
                 composable(
                     route = Screen.Root.route,
