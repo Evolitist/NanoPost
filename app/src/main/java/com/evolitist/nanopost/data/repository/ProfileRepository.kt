@@ -1,7 +1,10 @@
 package com.evolitist.nanopost.data.repository
 
+import androidx.paging.PagingData
 import com.evolitist.nanopost.domain.model.ImageInfo
 import com.evolitist.nanopost.domain.model.Profile
+import com.evolitist.nanopost.domain.model.ProfileCompact
+import kotlinx.coroutines.flow.Flow
 
 interface ProfileRepository {
 
@@ -14,4 +17,6 @@ interface ProfileRepository {
         avatar: ImageInfo?,
         progressCallback: (Float) -> Unit,
     ): Profile
+
+    fun getSubscribers(profileId: String): Flow<PagingData<ProfileCompact>>
 }

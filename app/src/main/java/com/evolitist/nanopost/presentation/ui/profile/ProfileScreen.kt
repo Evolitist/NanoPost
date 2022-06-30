@@ -47,6 +47,7 @@ fun ProfileScreen(
     onCloseClick: () -> Unit,
     onLogoutClick: () -> Unit,
     onImagesClick: (String?) -> Unit,
+    onSubscribersClick: (String?) -> Unit,
     onCreatePostClick: () -> Unit,
     onCreateProfileClick: () -> Unit,
     onPostClick: (String) -> Unit,
@@ -137,6 +138,7 @@ fun ProfileScreen(
                         is ProfileElement.ProfileItem -> ProfileCard(
                             profile = element.profile,
                             buttonText = "Edit",
+                            onSubscribersClick = { onSubscribersClick(profileId) },
                             onButtonClick = {},
                             modifier = Modifier.padding(horizontal = 8.dp),
                         )

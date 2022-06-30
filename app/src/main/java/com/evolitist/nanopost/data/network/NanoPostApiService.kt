@@ -5,6 +5,7 @@ import com.evolitist.nanopost.data.extensions.query
 import com.evolitist.nanopost.data.network.model.ApiImage
 import com.evolitist.nanopost.data.network.model.ApiPost
 import com.evolitist.nanopost.data.network.model.ApiProfile
+import com.evolitist.nanopost.data.network.model.ApiProfileCompact
 import com.evolitist.nanopost.data.network.model.Empty
 import com.evolitist.nanopost.data.network.model.response.PagedDataResponse
 import com.evolitist.nanopost.di.ApiClient
@@ -90,6 +91,16 @@ class NanoPostApiService @Inject constructor(
         path(id)
         query("count", count)
         query("offset", nextFrom)
+    }
+
+    suspend fun getSubscribers(
+        id: String?,
+        count: Int,
+        offset: String?,
+    ): PagedDataResponse<ApiProfileCompact> = get("subscribers") {
+        path(id)
+        query("count", count)
+        query("offset", offset)
     }
 
     suspend fun putImage(

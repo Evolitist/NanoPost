@@ -43,6 +43,7 @@ import com.evolitist.nanopost.presentation.ui.image.ImageScreen
 import com.evolitist.nanopost.presentation.ui.images.ImagesScreen
 import com.evolitist.nanopost.presentation.ui.post.PostScreen
 import com.evolitist.nanopost.presentation.ui.profile.ProfileScreen
+import com.evolitist.nanopost.presentation.ui.subscribers.SubscribersScreen
 import com.evolitist.nanopost.presentation.ui.view.AlertDialogContent
 import com.evolitist.nanopost.presentation.ui.view.ModalBottomSheetLayout
 import com.evolitist.nanopost.presentation.ui.view.NavigationBar
@@ -69,6 +70,7 @@ enum class Screen(
     ProfileGraph("profile_graph", R.string.profile),
     Profile("profile", R.string.profile),
     Images("images", R.string.images),
+    Subscribers("subscribers", R.string.subscribers),
     CreatePost("create_post", R.string.create_post),
     CreateProfile("create_profile", R.string.create_profile),
     Post("post", R.string.post),
@@ -240,6 +242,9 @@ fun AppNavGraph() {
                             onImagesClick = {
                                 navController.navigate(Screen.Images.route)
                             },
+                            onSubscribersClick = {
+                                navController.navigate(Screen.Subscribers.route)
+                            },
                             onCreatePostClick = {
                                 navController.navigate(Screen.CreatePost.route)
                             },
@@ -286,6 +291,11 @@ fun NavGraphBuilder.commonRoutes(navController: NavController) {
                     Screen.Images.route + profileId?.let { "?id=$it" }.orEmpty()
                 )
             },
+            onSubscribersClick = { profileId ->
+                navController.navigate(
+                    Screen.Subscribers.route + profileId?.let { "?id=$it" }.orEmpty()
+                )
+            },
             onCreatePostClick = {
                 navController.navigate(Screen.CreatePost.route)
             },
@@ -320,6 +330,26 @@ fun NavGraphBuilder.commonRoutes(navController: NavController) {
             },
             onImageClick = {
                 navController.navigate("${Screen.Image.route}/$it")
+            },
+        )
+    }
+
+    composable(
+        route = "${Screen.Subscribers.route}?id={id}",
+        arguments = listOf(
+            navArgument("id") {
+                type = NavType.StringType
+                nullable = true
+            }
+        ),
+    ) { backStackEntry ->
+        SubscribersScreen(
+            profileId = backStackEntry.arguments?.getString("id"),
+            onCloseClick = {
+                navController.navigateUp()
+            },
+            onProfileClick = {
+                navController.navigate("${Screen.Profile.route}?id=$it")
             },
         )
     }

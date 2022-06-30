@@ -1,5 +1,6 @@
 package com.evolitist.nanopost.presentation.ui.view
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -20,6 +21,7 @@ import com.evolitist.nanopost.domain.model.Profile
 fun ProfileCard(
     profile: Profile,
     buttonText: String,
+    onSubscribersClick: () -> Unit,
     onButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -44,7 +46,10 @@ fun ProfileCard(
                 Counter(
                     count = profile.subscribersCount,
                     description = "subscribers",
-                    modifier = Modifier.fillMaxHeight().weight(1f),
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f)
+                        .clickable(onClick = onSubscribersClick),
                 )
                 Counter(
                     count = profile.imagesCount,
