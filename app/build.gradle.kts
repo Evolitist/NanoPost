@@ -1,11 +1,12 @@
 plugins {
-    id("com.android.application")
-    kotlin("android")
-    kotlin("plugin.parcelize")
-    kotlin("plugin.serialization")
-    kotlin("kapt")
-    id("com.google.dagger.hilt.android")
-    id("com.google.gms.google-services")
+    alias(libs.plugins.android.app)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.crashlytics)
+    alias(libs.plugins.gms)
 }
 
 android {
@@ -22,6 +23,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 file("proguard-rules.pro")
@@ -31,11 +33,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11.toString()
         freeCompilerArgs = listOf(
             "-opt-in=kotlin.RequiresOptIn",
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
@@ -49,7 +52,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.2.0"
+        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
 }
 
@@ -58,66 +61,60 @@ kapt {
 }
 
 dependencies {
+    implementation(libs.kotlin.collections)
+    implementation(libs.kotlin.serialization)
+
     // UI
-    implementation("androidx.core:core-splashscreen:1.0.0-rc01")
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.splashscreen)
 
-    val composeVersion = "1.2.0-rc03"
-    implementation("androidx.compose.compiler:compiler:1.2.0")
-    implementation("androidx.compose.animation:animation:$composeVersion")
-    implementation("androidx.compose.foundation:foundation:$composeVersion")
-    implementation("androidx.compose.material:material:$composeVersion")
-    implementation("androidx.compose.material:material-icons-extended:$composeVersion")
-    implementation("androidx.compose.ui:ui:$composeVersion")
+    implementation(libs.compose.animation)
+    implementation(libs.compose.coil)
+    implementation(libs.compose.compiler)
+    implementation(libs.compose.foundation)
+    implementation(libs.compose.material)
+    implementation(libs.compose.material.v3)
+    implementation(libs.compose.material.icons)
+    implementation(libs.compose.material.motion)
+    implementation(libs.compose.navigation)
+    implementation(libs.compose.paging)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.viewmodel)
 
-    val accompanistVersion = "0.24.13-rc"
-    implementation("com.google.accompanist:accompanist-navigation-animation:$accompanistVersion")
-    implementation("com.google.accompanist:accompanist-navigation-material:$accompanistVersion")
-    implementation("com.google.accompanist:accompanist-pager:$accompanistVersion")
-    implementation("com.google.accompanist:accompanist-permissions:$accompanistVersion")
-    implementation("com.google.accompanist:accompanist-placeholder-material:$accompanistVersion")
-    implementation("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
-    implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
-
-    implementation("androidx.compose.material3:material3:1.0.0-alpha14")
-    implementation("io.github.fornewid:material-motion-compose-core:0.9.0-rc02")
-    implementation("io.coil-kt:coil-compose:2.1.0")
-
-    // Architecture & navigation
-    implementation("androidx.activity:activity-compose:1.4.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1")
-    implementation("androidx.navigation:navigation-compose:2.4.2")
+    implementation(libs.accompanist.navigation.animation)
+    implementation(libs.accompanist.navigation.material)
+    implementation(libs.accompanist.pager)
+    implementation(libs.accompanist.permissions)
+    implementation(libs.accompanist.placeholder.material)
+    implementation(libs.accompanist.swiperefresh)
+    implementation(libs.accompanist.systemuicontroller)
 
     // DI
-    implementation("com.google.dagger:hilt-android:2.42")
-    kapt("com.google.dagger:hilt-android-compiler:2.42")
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    implementation(libs.hilt)
+    kapt(libs.hilt.compiler)
+    implementation(libs.hilt.compose)
 
     // Storage
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation(libs.androidx.datastore)
 
     // Network
-    val ktorVersion = "2.0.1"
-    implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
-    implementation("io.ktor:ktor-client-auth:$ktorVersion")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-client-logging:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
-
-    // Paging
-    implementation("androidx.paging:paging-compose:1.0.0-alpha15")
+    implementation(libs.ktor.okhttp)
+    implementation(libs.ktor.auth)
+    implementation(libs.ktor.contentnegotiation)
+    implementation(libs.ktor.logging)
+    implementation(libs.ktor.serialization)
 
     // Background tasks
-    implementation("androidx.work:work-runtime-ktx:2.7.1")
-    implementation("androidx.hilt:hilt-work:1.0.0")
-    kapt("androidx.hilt:hilt-compiler:1.0.0")
+    implementation(libs.androidx.work)
+    implementation(libs.hilt.work)
+    kapt(libs.hilt.work.compiler)
 
     // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:30.1.0"))
-    implementation("com.google.firebase:firebase-analytics-ktx")
-    implementation("com.google.firebase:firebase-messaging-ktx")
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.messaging)
 
     // Debug stuff
-    debugImplementation("org.slf4j:slf4j-android:1.7.36")
-    debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
+    debugImplementation(libs.slf4j)
+    debugImplementation(libs.compose.ui.tooling)
 }

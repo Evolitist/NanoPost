@@ -1,14 +1,12 @@
 plugins {
-    id("com.android.application") version "7.0.4" apply false
-    id("com.android.library") version "7.0.4" apply false
-
-    val kotlinVersion = "1.7.0"
-    kotlin("android") version kotlinVersion apply false
-    kotlin("plugin.serialization") version kotlinVersion apply false
-
-    id("com.google.dagger.hilt.android") version "2.42" apply false
-
-    id("com.google.gms.google-services") version "4.3.10" apply false
+    alias(libs.plugins.android.app) apply false
+    alias(libs.plugins.android.lib) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.kapt) apply false
+    alias(libs.plugins.kotlin.parcelize) apply false
+    alias(libs.plugins.hilt) apply false
+    alias(libs.plugins.crashlytics) apply false
+    alias(libs.plugins.gms) apply false
 }
 
 tasks.register<Delete>("clean") {
