@@ -16,7 +16,6 @@ import com.evolitist.nanopost.domain.model.ImageInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
-import java.io.InputStream
 import javax.inject.Inject
 
 class ContentRepositoryImpl @Inject constructor(
@@ -27,11 +26,6 @@ class ContentRepositoryImpl @Inject constructor(
     companion object {
         private const val MaxImageSize = 2560
         private const val DefaultFileName = "image"
-    }
-
-    private fun resolve(contentUri: Uri): InputStream? {
-        contentResolver.getType(contentUri)
-        return contentResolver.openInputStream(contentUri)
     }
 
     override suspend fun resolveUri(contentUri: Uri): ImageInfo = withContext(Dispatchers.Default) {
