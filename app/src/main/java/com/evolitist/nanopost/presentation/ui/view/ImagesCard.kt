@@ -25,11 +25,11 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.evolitist.nanopost.R
 import com.evolitist.nanopost.domain.model.Image
-import com.evolitist.nanopost.presentation.extensions.ImmutableWrapper
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun ImagesCard(
-    images: ImmutableWrapper<List<Image>>,
+    images: ImmutableList<Image>,
     onCardClick: () -> Unit,
     onImageClick: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -70,7 +70,7 @@ fun ImagesCard(
                             .weight(1f)
                             .aspectRatio(1f),
                     ) {
-                        images.data.getOrNull(it)?.let { image ->
+                        images.getOrNull(it)?.let { image ->
                             AsyncImage(
                                 image.sizes.last().url,
                                 contentDescription = null,

@@ -38,9 +38,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.evolitist.nanopost.R
 import com.evolitist.nanopost.domain.model.UsernameCheckResult
-import com.evolitist.nanopost.presentation.extensions.immutable
 import com.evolitist.nanopost.presentation.ui.view.HelperTextField
 import com.evolitist.nanopost.presentation.ui.view.autofill
+import kotlinx.collections.immutable.persistentListOf
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -120,7 +120,7 @@ fun AuthScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .autofill(
-                        autofillTypes = listOf(AutofillType.Username).immutable(),
+                        autofillTypes = persistentListOf(AutofillType.Username),
                         onFill = { username = it },
                     ),
             )
@@ -144,7 +144,7 @@ fun AuthScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .autofill(
-                            autofillTypes = listOf(AutofillType.Password).immutable(),
+                            autofillTypes = persistentListOf(AutofillType.Password),
                             onFill = { password = it },
                         ),
                 )

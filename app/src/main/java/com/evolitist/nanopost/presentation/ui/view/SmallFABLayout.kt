@@ -49,13 +49,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun <T> SmallFABLayout(
-    items: () -> List<T>,
+    items: ImmutableList<T>,
     content: @Composable () -> Unit,
     label: @Composable (T) -> Unit,
     button: @Composable (T) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val layoutExpanded = remember { MutableTransitionState(false) }
     val transition = updateTransition(transitionState = layoutExpanded, label = "FAB layout")
@@ -141,12 +143,12 @@ fun <T> SmallFABLayout(
 @Composable
 private fun <T> SmallFABLayoutPopupContents(
     transition: Transition<Boolean>,
-    items: () -> List<T>,
+    items: ImmutableList<T>,
     expandingFab: @Composable () -> Unit,
     label: @Composable (T) -> Unit,
     button: @Composable (T) -> Unit,
 ) {
-    val itemList = remember(items) { items().asReversed() }
+    val itemList = remember(items) { items.asReversed() }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Bottom),

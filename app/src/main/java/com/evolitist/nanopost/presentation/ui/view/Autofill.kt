@@ -13,18 +13,18 @@ import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalAutofill
 import androidx.compose.ui.platform.LocalAutofillTree
-import com.evolitist.nanopost.presentation.extensions.ImmutableWrapper
+import kotlinx.collections.immutable.ImmutableList
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun Modifier.autofill(
-    autofillTypes: ImmutableWrapper<List<AutofillType>>,
+    autofillTypes: ImmutableList<AutofillType>,
     onFill: (String) -> Unit,
 ) = composed {
     val onFillState by rememberUpdatedState(onFill)
 
     val autofill = LocalAutofill.current
     val autofillNode = remember(autofillTypes) {
-        AutofillNode(onFill = onFillState, autofillTypes = autofillTypes.data)
+        AutofillNode(onFill = onFillState, autofillTypes = autofillTypes)
     }
     LocalAutofillTree.current += autofillNode
 

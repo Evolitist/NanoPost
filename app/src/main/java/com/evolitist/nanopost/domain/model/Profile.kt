@@ -1,9 +1,7 @@
 package com.evolitist.nanopost.domain.model
 
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
+import kotlinx.collections.immutable.ImmutableList
 
-@Immutable
 data class Profile(
     override val id: String,
     val username: String,
@@ -16,10 +14,9 @@ data class Profile(
     val subscribersCount: Int,
     val postsCount: Int,
     val imagesCount: Int,
-    val images: List<Image>,
+    val images: ImmutableList<Image>,
 ) : Identifiable {
 
-    @Stable
     fun compact() = ProfileCompact(
         id = id,
         username = username,

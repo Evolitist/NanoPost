@@ -62,7 +62,7 @@ fun FeedScreen(
         },
         floatingActionButton = {
             SmallFABLayout(
-                items = { listOf(CreateActions.Profile, CreateActions.Post) },
+                items = persistentListOf(CreateActions.Profile, CreateActions.Post),
                 content = { Icon(Icons.Rounded.Add, contentDescription = null) },
                 label = {
                     when (it) {

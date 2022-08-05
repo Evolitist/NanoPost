@@ -2,6 +2,7 @@ package com.evolitist.nanopost.domain.mapper
 
 import com.evolitist.nanopost.domain.model.Profile
 import com.evolitist.nanopost.data.network.model.ApiProfile
+import kotlinx.collections.immutable.toImmutableList
 import javax.inject.Inject
 
 class ProfileMapper @Inject constructor(
@@ -19,6 +20,6 @@ class ProfileMapper @Inject constructor(
         subscribersCount = api.subscribersCount,
         postsCount = api.postsCount,
         imagesCount = api.imagesCount,
-        images = api.images.map(imageMapper::fromApiToModel),
+        images = api.images.map(imageMapper::fromApiToModel).toImmutableList(),
     )
 }
