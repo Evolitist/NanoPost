@@ -1,17 +1,14 @@
-package com.evolitist.nanopost.presentation.ui.subscribers
+package com.evolitist.nanopost.presentation.ui.posts
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -19,29 +16,31 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
+import androidx.paging.compose.items
 import com.evolitist.nanopost.R
-import com.evolitist.nanopost.presentation.extensions.items
 import com.evolitist.nanopost.presentation.extensions.loadState
-import com.evolitist.nanopost.presentation.ui.view.Avatar
 import com.evolitist.nanopost.presentation.ui.view.CenterAlignedTopAppBar
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.evolitist.nanopost.presentation.ui.view.PostCard
 
 @Composable
-fun SubscribersScreen(
-    viewModel: SubscribersViewModel = hiltViewModel(),
-    profileId: String?,
+fun PostsScreen(
+    viewModel: PostsViewModel = hiltViewModel(),
+    profileId: String? = null,
     onCloseClick: () -> Unit,
+    onPostClick: (String) -> Unit,
     onProfileClick: (String) -> Unit,
+    onImageClick: (String) -> Unit,
 ) {
-    val data = viewModel.subscribersPagingItems
+    val data = viewModel.postsPagingItems
     val swipeRefreshState = rememberSwipeRefreshState(
         data.loadState.refresh == LoadState.Loading
     )
@@ -63,7 +62,7 @@ fun SubscribersScreen(
                         onClick = onCloseClick,
                     )
                 },
-                title = { Text(stringResource(R.string.subscribers)) },
+                title = { Text(stringResource(R.string.posts)) },
                 scrollBehavior = scrollBehavior,
             )
         },
@@ -74,6 +73,8 @@ fun SubscribersScreen(
             modifier = Modifier.padding(padding),
         ) {
             LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
+                contentPadding = PaddingValues(vertical = 8.dp),
                 modifier = Modifier
                     .fillMaxSize()
                     .nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -81,21 +82,15 @@ fun SubscribersScreen(
                 items(
                     items = data,
                     key = { it.id },
-                ) { profile ->
-                    profile?.let {
-                        ListItem(
-                            leadingContent = {
-                                Avatar(
-                                    profile = it,
-                                    monogramFontSize = 16.sp,
-                                    modifier = Modifier.size(40.dp),
-                                )
-                            },
-                            headlineText = { Text(it.displayName ?: it.username) },
-                            modifier = Modifier.clickable { onProfileClick(it.id) },
+                ) { post ->
+                    post?.let {
+                        PostCard(
+                            post = it,
+                            onClick = onPostClick,
+                            onImageClick = onImageClick,
+                            onHeaderClick = onProfileClick,
+                            modifier = Modifier.padding(horizontal = 8.dp),
                         )
-
-                        Divider(color = MaterialTheme.colorScheme.surfaceVariant)
                     }
                 }
 

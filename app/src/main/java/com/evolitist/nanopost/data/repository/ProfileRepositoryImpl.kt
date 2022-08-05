@@ -50,4 +50,12 @@ class ProfileRepositoryImpl @Inject constructor(
             it.map(profileCompactMapper::fromApiToModel)
         }
     }
+
+    override suspend fun subscribe(profileId: String) {
+        apiService.subscribe(profileId)
+    }
+
+    override suspend fun unsubscribe(profileId: String) {
+        apiService.unsubscribe(profileId)
+    }
 }

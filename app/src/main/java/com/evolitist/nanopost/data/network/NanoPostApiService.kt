@@ -103,6 +103,12 @@ class NanoPostApiService @Inject constructor(
         query("offset", offset)
     }
 
+    suspend fun subscribe(id: String) = put<Empty>("profile/$id/subscribe") {
+    }
+
+    suspend fun unsubscribe(id: String) = delete<Empty>("profile/$id/subscribe") {
+    }
+
     suspend fun putImage(
         imageInfo: ImageInfo,
         onUpload: (Float) -> Unit,

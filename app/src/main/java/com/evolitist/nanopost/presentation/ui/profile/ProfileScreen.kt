@@ -28,17 +28,18 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
-import com.evolitist.nanopost.presentation.extensions.immutable
 import com.evolitist.nanopost.presentation.extensions.items
 import com.evolitist.nanopost.presentation.extensions.loadState
 import com.evolitist.nanopost.presentation.ui.create.CreateActions
 import com.evolitist.nanopost.presentation.ui.view.CenterAlignedTopAppBar
 import com.evolitist.nanopost.presentation.ui.view.ImagesCard
 import com.evolitist.nanopost.presentation.ui.view.PostCard
+import com.evolitist.nanopost.presentation.ui.view.ProfileButtonState
 import com.evolitist.nanopost.presentation.ui.view.ProfileCard
 import com.evolitist.nanopost.presentation.ui.view.SmallFABLayout
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun ProfileScreen(
@@ -46,8 +47,9 @@ fun ProfileScreen(
     profileId: String? = null,
     onCloseClick: () -> Unit,
     onLogoutClick: () -> Unit,
-    onImagesClick: (String?) -> Unit,
     onSubscribersClick: (String?) -> Unit,
+    onImagesClick: (String?) -> Unit,
+    onPostsClick: (String?) -> Unit,
     onCreatePostClick: () -> Unit,
     onCreateProfileClick: () -> Unit,
     onPostClick: (String) -> Unit,
@@ -71,50 +73,52 @@ fun ProfileScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 navigationIcon = {
-                    if (profileId != null) {
-                        IconButton(
-                            content = { Icon(Icons.Rounded.ArrowBack, contentDescription = null) },
-                            onClick = onCloseClick,
-                        )
-                    }
+                    IconButton(
+                        content = { Icon(Icons.Rounded.ArrowBack, contentDescription = null) },
+                        onClick = onCloseClick,
+                    )
                 },
                 title = { Text("Profile") },
                 actions = {
-                    IconButton(
-                        content = { Icon(Icons.Rounded.Logout, contentDescription = null) },
-                        onClick = onLogoutClick,
-                    )
+                    if (profileId == null) {
+                        IconButton(
+                            content = { Icon(Icons.Rounded.Logout, contentDescription = null) },
+                            onClick = onLogoutClick,
+                        )
+                    }
                 },
                 scrollBehavior = scrollBehavior,
             )
         },
         floatingActionButton = {
-            SmallFABLayout(
-                items = { listOf(CreateActions.Profile, CreateActions.Post) },
-                content = { Icon(Icons.Rounded.Add, contentDescription = null) },
-                label = {
-                    when (it) {
-                        CreateActions.Post -> Text("Post")
-                        CreateActions.Profile -> Text("Profile")
-                    }
-                },
-                button = {
-                    when (it) {
-                        CreateActions.Post -> SmallFloatingActionButton(
-                            onClick = onCreatePostClick,
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            contentColor = MaterialTheme.colorScheme.primary,
-                            content = { Icon(Icons.Rounded.PostAdd, contentDescription = null) },
-                        )
-                        CreateActions.Profile -> SmallFloatingActionButton(
-                            onClick = onCreateProfileClick,
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            contentColor = MaterialTheme.colorScheme.primary,
-                            content = { Icon(Icons.Rounded.GroupAdd, contentDescription = null) },
-                        )
-                    }
-                },
-            )
+            if (profileId == null) {
+                SmallFABLayout(
+                    items = persistentListOf(CreateActions.Profile, CreateActions.Post),
+                    content = { Icon(Icons.Rounded.Add, contentDescription = null) },
+                    label = {
+                        when (it) {
+                            CreateActions.Post -> Text("Post")
+                            CreateActions.Profile -> Text("Profile")
+                        }
+                    },
+                    button = {
+                        when (it) {
+                            CreateActions.Post -> SmallFloatingActionButton(
+                                onClick = onCreatePostClick,
+                                containerColor = MaterialTheme.colorScheme.surface,
+                                contentColor = MaterialTheme.colorScheme.primary,
+                                content = { Icon(Icons.Rounded.PostAdd, contentDescription = null) },
+                            )
+                            CreateActions.Profile -> SmallFloatingActionButton(
+                                onClick = onCreateProfileClick,
+                                containerColor = MaterialTheme.colorScheme.surface,
+                                contentColor = MaterialTheme.colorScheme.primary,
+                                content = { Icon(Icons.Rounded.GroupAdd, contentDescription = null) },
+                            )
+                        }
+                    },
+                )
+            }
         },
     ) { padding ->
         SwipeRefresh(
@@ -137,13 +141,29 @@ fun ProfileScreen(
                     when (element) {
                         is ProfileElement.ProfileItem -> ProfileCard(
                             profile = element.profile,
-                            buttonText = "Edit",
+                            buttonState = if (profileId == null) {
+                                ProfileButtonState.Edit
+                            } else if (element.profile.subscribed) {
+                                ProfileButtonState.Unsubscribe
+                            } else {
+                                ProfileButtonState.Subscribe
+                            },
                             onSubscribersClick = { onSubscribersClick(profileId) },
-                            onButtonClick = {},
+                            onImagesClick = { onImagesClick(profileId) },
+                            onPostsClick = { onPostsClick(profileId) },
+                            onButtonClick = {
+                                if (profileId == null) {
+                                    // TODO edit profile
+                                } else if (element.profile.subscribed) {
+                                    viewModel.unsubscribe(data::refresh)
+                                } else {
+                                    viewModel.subscribe(data::refresh)
+                                }
+                            },
                             modifier = Modifier.padding(horizontal = 8.dp),
                         )
                         is ProfileElement.ImagesItem -> ImagesCard(
-                            images = element.images.immutable(),
+                            images = element.images,
                             onCardClick = { onImagesClick(profileId) },
                             onImageClick = onImageClick,
                             modifier = Modifier.padding(horizontal = 8.dp),

@@ -1,40 +1,24 @@
 package com.evolitist.nanopost.presentation.ui
 
-import androidx.annotation.StringRes
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AccountCircle
-import androidx.compose.material.icons.rounded.DynamicFeed
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
-import com.evolitist.nanopost.R
 import com.evolitist.nanopost.presentation.ui.auth.AuthScreen
 import com.evolitist.nanopost.presentation.ui.create.post.CreatePostScreen
 import com.evolitist.nanopost.presentation.ui.create.profile.CreateProfileScreen
@@ -42,68 +26,50 @@ import com.evolitist.nanopost.presentation.ui.feed.FeedScreen
 import com.evolitist.nanopost.presentation.ui.image.ImageScreen
 import com.evolitist.nanopost.presentation.ui.images.ImagesScreen
 import com.evolitist.nanopost.presentation.ui.post.PostScreen
+import com.evolitist.nanopost.presentation.ui.posts.PostsScreen
 import com.evolitist.nanopost.presentation.ui.profile.ProfileScreen
 import com.evolitist.nanopost.presentation.ui.subscribers.SubscribersScreen
 import com.evolitist.nanopost.presentation.ui.view.AlertDialogContent
 import com.evolitist.nanopost.presentation.ui.view.ModalBottomSheetLayout
-import com.evolitist.nanopost.presentation.ui.view.NavigationBar
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
-import com.google.accompanist.navigation.animation.navigation
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
+import soup.compose.material.motion.animation.materialSharedAxisXIn
+import soup.compose.material.motion.animation.materialSharedAxisXOut
+import soup.compose.material.motion.animation.rememberSlideDistance
 
-@Immutable
 enum class Screen(
     val route: String,
-    @StringRes val titleStringId: Int,
 ) {
-    NavGraph("nav_graph", 0),
-    Root("root", 0),
-    Auth("auth", R.string.auth),
-    Logout("logout", R.string.logout),
-    FeedGraph("feed_graph", R.string.feed),
-    Feed("feed", R.string.feed),
-    SearchGraph("search_graph", R.string.search),
-    Search("search", R.string.search),
-    ProfileGraph("profile_graph", R.string.profile),
-    Profile("profile", R.string.profile),
-    Images("images", R.string.images),
-    Subscribers("subscribers", R.string.subscribers),
-    CreatePost("create_post", R.string.create_post),
-    CreateProfile("create_profile", R.string.create_profile),
-    Post("post", R.string.post),
-    Image("image", R.string.image);
-
-    companion object {
-        val hideNavigationBar = setOf(Root, Auth, CreatePost, Image, Post)
-        val bottomNavigationItems = mapOf(
-            FeedGraph to Icons.Rounded.DynamicFeed,
-            SearchGraph to Icons.Rounded.Search,
-            ProfileGraph to Icons.Rounded.AccountCircle,
-        )
-    }
-
-    fun matches(destination: NavDestination?): Boolean {
-        return destination?.hierarchy?.any {
-            it.route?.split("/", "?")?.first { it.isNotEmpty() } == this.route
-        } == true
-    }
+    NavGraph("nav_graph"),
+    Root("root"),
+    Auth("auth"),
+    Logout("logout"),
+    Feed("feed"),
+    Search("search"),
+    Profile("profile"),
+    Subscribers("subscribers"),
+    Images("images"),
+    Posts("posts"),
+    CreatePost("create_post"),
+    CreateProfile("create_profile"),
+    Post("post"),
+    Image("image");
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
 @Composable
 fun AppNavGraph() {
-    val activityViewModel = hiltViewModel<MainViewModel>()
+    val activityViewModel = LocalActivityViewModel.current
     val bottomSheetNavigator = rememberBottomSheetNavigator()
     val navController = rememberAnimatedNavController(bottomSheetNavigator)
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
 
-    val authStatus by activityViewModel.appStatusFlow.collectAsState()
+    val showAuth by activityViewModel.showAuthFlow.collectAsState()
 
-    LaunchedEffect(authStatus) {
-        when (authStatus) {
+    LaunchedEffect(showAuth) {
+        when (showAuth) {
             true -> navController.navigate(Screen.Auth.route) {
                 popUpTo(Screen.NavGraph.route)
             }
@@ -117,36 +83,16 @@ fun AppNavGraph() {
     ModalBottomSheetLayout(
         bottomSheetNavigator = bottomSheetNavigator,
     ) {
-        Scaffold(
-            bottomBar = {
-                if (Screen.hideNavigationBar.none { it.matches(navBackStackEntry?.destination) }) {
-                    NavigationBar {
-                        Screen.bottomNavigationItems.forEach { (screen, icon) ->
-                            NavigationBarItem(
-                                icon = { Icon(icon, contentDescription = null) },
-                                label = { Text(stringResource(screen.titleStringId)) },
-                                selected = screen.matches(navBackStackEntry?.destination),
-                                onClick = {
-                                    navController.navigate(screen.route) {
-                                        popUpTo(Screen.NavGraph.route) {
-                                            saveState = true
-                                        }
-                                        launchSingleTop = true
-                                        restoreState = true
-                                    }
-                                },
-                            )
-                        }
-                    }
-                }
-            }
-        ) { innerPadding ->
+        Scaffold { innerPadding ->
+            val slideDistance = rememberSlideDistance()
             AnimatedNavHost(
                 navController = navController,
                 route = Screen.NavGraph.route,
                 startDestination = Screen.Root.route,
-                enterTransition = { EnterTransition.None },
-                exitTransition = { ExitTransition.None },
+                enterTransition = { materialSharedAxisXIn(true, slideDistance) },
+                exitTransition = { materialSharedAxisXOut(true, slideDistance) },
+                popEnterTransition = { materialSharedAxisXIn(false, slideDistance) },
+                popExitTransition = { materialSharedAxisXOut(false, slideDistance) },
                 modifier = Modifier.padding(innerPadding),
             ) {
                 composable(
@@ -188,87 +134,35 @@ fun AppNavGraph() {
                     )
                 }
 
-                commonRoutes(navController)
-
-                navigation(
-                    route = Screen.FeedGraph.route,
-                    startDestination = Screen.Feed.route,
-                ) {
-                    composable(Screen.Feed.route) {
-                        FeedScreen(
-                            onCreatePostClick = {
-                                navController.navigate(Screen.CreatePost.route)
-                            },
-                            onCreateProfileClick = {
-                                navController.navigate(Screen.CreateProfile.route)
-                            },
-                            onPostClick = {
-                                navController.navigate("${Screen.Post.route}/$it")
-                            },
-                            onImageClick = {
-                                navController.navigate("${Screen.Image.route}/$it")
-                            },
-                            onProfileClick = {
-                                navController.navigate("${Screen.Profile.route}?id=$it")
-                            },
-                        )
-                    }
-                }
-
-                navigation(
-                    route = Screen.SearchGraph.route,
-                    startDestination = Screen.Search.route,
-                ) {
-                    composable(Screen.Search.route) {
-                        Surface(modifier = Modifier.fillMaxSize()) {
-                            Text("NYI")
-                        }
-                    }
-                }
-
-                navigation(
-                    route = Screen.ProfileGraph.route,
-                    startDestination = Screen.Profile.route,
-                ) {
-                    composable(Screen.Profile.route) {
-                        ProfileScreen(
-                            profileId = null,
-                            onCloseClick = {
-                                navController.navigateUp()
-                            },
-                            onLogoutClick = {
-                                navController.navigate(Screen.Logout.route)
-                            },
-                            onImagesClick = {
-                                navController.navigate(Screen.Images.route)
-                            },
-                            onSubscribersClick = {
-                                navController.navigate(Screen.Subscribers.route)
-                            },
-                            onCreatePostClick = {
-                                navController.navigate(Screen.CreatePost.route)
-                            },
-                            onCreateProfileClick = {
-                                navController.navigate(Screen.CreateProfile.route)
-                            },
-                            onPostClick = {
-                                navController.navigate("${Screen.Post.route}/$it")
-                            },
-                            onImageClick = {
-                                navController.navigate("${Screen.Image.route}/$it")
-                            },
-                            onProfileClick = {
-                                navController.navigate("${Screen.Profile.route}?id=$it")
-                            },
-                        )
-                    }
-                }
+                authorizedRoutes(navController)
             }
         }
     }
 }
 
-fun NavGraphBuilder.commonRoutes(navController: NavController) {
+fun NavGraphBuilder.authorizedRoutes(navController: NavController) {
+    composable(Screen.Feed.route) {
+        FeedScreen(
+            onCreatePostClick = {
+                navController.navigate(Screen.CreatePost.route)
+            },
+            onCreateProfileClick = {
+                navController.navigate(Screen.CreateProfile.route)
+            },
+            onPostClick = {
+                navController.navigate("${Screen.Post.route}/$it")
+            },
+            onImageClick = {
+                navController.navigate("${Screen.Image.route}/$it")
+            },
+            onProfileClick = { profileId ->
+                navController.navigate(
+                    Screen.Profile.route + profileId?.let { "?id=$it" }.orEmpty()
+                )
+            },
+        )
+    }
+
     composable(
         route = "${Screen.Profile.route}?id={id}",
         arguments = listOf(
@@ -286,14 +180,19 @@ fun NavGraphBuilder.commonRoutes(navController: NavController) {
             onLogoutClick = {
                 navController.navigate(Screen.Logout.route)
             },
+            onSubscribersClick = { profileId ->
+                navController.navigate(
+                    Screen.Subscribers.route + profileId?.let { "?id=$it" }.orEmpty()
+                )
+            },
             onImagesClick = { profileId ->
                 navController.navigate(
                     Screen.Images.route + profileId?.let { "?id=$it" }.orEmpty()
                 )
             },
-            onSubscribersClick = { profileId ->
+            onPostsClick = { profileId ->
                 navController.navigate(
-                    Screen.Subscribers.route + profileId?.let { "?id=$it" }.orEmpty()
+                    Screen.Posts.route + profileId?.let { "?id=$it" }.orEmpty()
                 )
             },
             onCreatePostClick = {
@@ -307,6 +206,26 @@ fun NavGraphBuilder.commonRoutes(navController: NavController) {
             },
             onImageClick = {
                 navController.navigate("${Screen.Image.route}/$it")
+            },
+            onProfileClick = {
+                navController.navigate("${Screen.Profile.route}?id=$it")
+            },
+        )
+    }
+
+    composable(
+        route = "${Screen.Subscribers.route}?id={id}",
+        arguments = listOf(
+            navArgument("id") {
+                type = NavType.StringType
+                nullable = true
+            }
+        ),
+    ) { backStackEntry ->
+        SubscribersScreen(
+            profileId = backStackEntry.arguments?.getString("id"),
+            onCloseClick = {
+                navController.navigateUp()
             },
             onProfileClick = {
                 navController.navigate("${Screen.Profile.route}?id=$it")
@@ -335,7 +254,7 @@ fun NavGraphBuilder.commonRoutes(navController: NavController) {
     }
 
     composable(
-        route = "${Screen.Subscribers.route}?id={id}",
+        route = "${Screen.Posts.route}?id={id}",
         arguments = listOf(
             navArgument("id") {
                 type = NavType.StringType
@@ -343,10 +262,16 @@ fun NavGraphBuilder.commonRoutes(navController: NavController) {
             }
         ),
     ) { backStackEntry ->
-        SubscribersScreen(
+        PostsScreen(
             profileId = backStackEntry.arguments?.getString("id"),
             onCloseClick = {
                 navController.navigateUp()
+            },
+            onPostClick = {
+                navController.navigate("${Screen.Post.route}/$it")
+            },
+            onImageClick = {
+                navController.navigate("${Screen.Image.route}/$it")
             },
             onProfileClick = {
                 navController.navigate("${Screen.Profile.route}?id=$it")
