@@ -1,5 +1,8 @@
 package com.evolitist.nanopost.presentation.ui.view
 
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +31,7 @@ import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlin.math.max
@@ -266,20 +270,23 @@ private fun SingleRowTopAppBar(
     scrollBehavior: TopAppBarScrollBehavior?,
     contentPadding: PaddingValues,
 ) {
-    // TODO(b/182393826): Check if there is a better place to set the offsetLimit.
-    // Set a scroll offset limit to hide the entire app bar area when scrolling.
-    val offsetLimit = with(LocalDensity.current) { -64.dp.toPx() }
+    val totalPadding = contentPadding.calculateTopPadding() + contentPadding.calculateBottomPadding()
+
+    // Sets the app bar's height offset to collapse the entire bar's height when content is
+    // scrolled.
+    val heightOffsetLimit = with(LocalDensity.current) { -(64.dp + totalPadding).toPx() }
     SideEffect {
-        if (scrollBehavior?.state?.offsetLimit != offsetLimit) {
-            scrollBehavior?.state?.offsetLimit = offsetLimit
+        if (scrollBehavior?.state?.heightOffsetLimit != heightOffsetLimit) {
+            scrollBehavior?.state?.heightOffsetLimit = heightOffsetLimit
         }
     }
 
-    // Obtain the container color from the TopAppBarColors.
+    // Obtain the container color from the TopAppBarColors using the `overlapFraction`. This
+    // ensures that the colors will adjust whether the app bar behavior is pinned or scrolled.
     // This may potentially animate or interpolate a transition between the container-color and the
     // container's scrolled-color according to the app bar's scroll state.
-    val scrollFraction = scrollBehavior?.scrollFraction ?: 0f
-    val appBarContainerColor by colors.containerColor(scrollFraction)
+    val colorTransitionFraction = scrollBehavior?.state?.overlappedFraction ?: 0f
+    val appBarContainerColor by colors.containerColor(colorTransitionFraction)
 
     // Wrap the given actions in a Row.
     val actionsRow = @Composable {
@@ -289,19 +296,34 @@ private fun SingleRowTopAppBar(
             content = actions,
         )
     }
+
+    // Set up support for resizing the top app bar when vertically dragging the bar itself.
+    val appBarDragModifier = Modifier.draggable(
+        orientation = Orientation.Vertical,
+        state = rememberDraggableState { delta ->
+            if (scrollBehavior != null && !scrollBehavior.isPinned) {
+                scrollBehavior.state.heightOffset = scrollBehavior.state.heightOffset + delta
+            }
+        }
+    )
+
     // Compose a Surface with a TopAppBarLayout content. The surface's background color will be
     // animated as specified above, and the height of the app bar will be determined by the current
     // scroll-state offset.
-    Surface(modifier = modifier, color = appBarContainerColor) {
+    Surface(
+        modifier = modifier.then(appBarDragModifier),
+        color = appBarContainerColor,
+    ) {
         val height = LocalDensity.current.run {
-            64.dp.toPx() + (scrollBehavior?.state?.offset ?: 0f)
+            64.dp.toPx() + (scrollBehavior?.state?.heightOffset ?: 0f)
         }
         TopAppBarLayout(
-            modifier = Modifier.padding(contentPadding),
+            modifier = Modifier,
             heightPx = height,
-            navigationIconContentColor = colors.navigationIconContentColor(scrollFraction).value,
-            titleContentColor = colors.titleContentColor(scrollFraction).value,
-            actionIconContentColor = colors.actionIconContentColor(scrollFraction).value,
+            contentPadding = contentPadding,
+            navigationIconContentColor = colors.navigationIconContentColor(colorTransitionFraction).value,
+            titleContentColor = colors.titleContentColor(colorTransitionFraction).value,
+            actionIconContentColor = colors.actionIconContentColor(colorTransitionFraction).value,
             title = title,
             titleTextStyle = titleTextStyle,
             titleAlpha = 1f,
@@ -343,35 +365,33 @@ private fun TwoRowsTopAppBar(
             "A TwoRowsTopAppBar max height should be greater than its pinned height"
         )
     }
+
+    val totalPadding = contentPadding.calculateTopPadding() + contentPadding.calculateBottomPadding()
+
     val pinnedHeightPx: Float
     val maxHeightPx: Float
     val titleBottomPaddingPx: Int
     LocalDensity.current.run {
-        pinnedHeightPx = pinnedHeight.toPx()
-        maxHeightPx = maxHeight.toPx()
+        pinnedHeightPx = (pinnedHeight + totalPadding).toPx()
+        maxHeightPx = (maxHeight + totalPadding).toPx()
         titleBottomPaddingPx = titleBottomPadding.roundToPx()
     }
 
-    // Set a scroll offset limit that will hide just the title area and will keep the small title
-    // area visible.
+    // Sets the app bar's height offset limit to hide just the bottom title area and keep top title
+    // visible when collapsed.
     SideEffect {
-        if (scrollBehavior?.state?.offsetLimit != pinnedHeightPx - maxHeightPx) {
-            scrollBehavior?.state?.offsetLimit = pinnedHeightPx - maxHeightPx
+        if (scrollBehavior?.state?.heightOffsetLimit != pinnedHeightPx - maxHeightPx) {
+            scrollBehavior?.state?.heightOffsetLimit = pinnedHeightPx - maxHeightPx
         }
     }
 
-    val scrollPercentage =
-        if (scrollBehavior == null || scrollBehavior.state.offsetLimit == 0f) {
-            0f
-        } else {
-            scrollBehavior.state.offset / scrollBehavior.state.offsetLimit
-        }
-
-    // Obtain the container Color from the TopAppBarColors.
+    // Obtain the container Color from the TopAppBarColors using the `collapsedFraction`, as the
+    // bottom part of this TwoRowsTopAppBar changes color at the same rate the app bar expands or
+    // collapse.
     // This will potentially animate or interpolate a transition between the container color and the
     // container's scrolled color according to the app bar's scroll state.
-    val scrollFraction = scrollBehavior?.scrollFraction ?: 0f
-    val appBarContainerColor by colors.containerColor(scrollFraction)
+    val colorTransitionFraction = scrollBehavior?.state?.collapsedFraction ?: 0f
+    val appBarContainerColor by colors.containerColor(colorTransitionFraction)
 
     // Wrap the given actions in a Row.
     val actionsRow = @Composable {
@@ -381,24 +401,34 @@ private fun TwoRowsTopAppBar(
             content = actions,
         )
     }
-    val titleAlpha = 1f - scrollPercentage
+    val titleAlpha = 1f - colorTransitionFraction
     // Hide the top row title semantics when its alpha value goes below 0.5 threshold.
     // Hide the bottom row title semantics when the top title semantics are active.
-    val hideTopRowSemantics = scrollPercentage < 0.5f
+    val hideTopRowSemantics = colorTransitionFraction < 0.5f
     val hideBottomRowSemantics = !hideTopRowSemantics
+
+    // Set up support for resizing the top app bar when vertically dragging the bar itself.
+    val appBarDragModifier = Modifier.draggable(
+        orientation = Orientation.Vertical,
+        state = rememberDraggableState { delta ->
+            if (scrollBehavior != null && !scrollBehavior.isPinned) {
+                scrollBehavior.state.heightOffset = scrollBehavior.state.heightOffset + delta
+            }
+        }
+    )
+
     Surface(
-        modifier = modifier,
+        modifier = modifier.then(appBarDragModifier),
         color = appBarContainerColor,
     ) {
-        Column(
-            modifier = Modifier.padding(contentPadding),
-        ) {
+        Column {
             TopAppBarLayout(
                 modifier = Modifier,
                 heightPx = pinnedHeightPx,
-                navigationIconContentColor = colors.navigationIconContentColor(scrollFraction).value,
-                titleContentColor = colors.titleContentColor(scrollFraction).value,
-                actionIconContentColor = colors.actionIconContentColor(scrollFraction).value,
+                contentPadding = contentPadding,
+                navigationIconContentColor = colors.navigationIconContentColor(colorTransitionFraction).value,
+                titleContentColor = colors.titleContentColor(colorTransitionFraction).value,
+                actionIconContentColor = colors.actionIconContentColor(colorTransitionFraction).value,
                 title = smallTitle,
                 titleTextStyle = smallTitleTextStyle,
                 titleAlpha = 1f - titleAlpha,
@@ -411,10 +441,11 @@ private fun TwoRowsTopAppBar(
             )
             TopAppBarLayout(
                 modifier = Modifier.clipToBounds(),
-                heightPx = maxHeightPx - pinnedHeightPx + (scrollBehavior?.state?.offset ?: 0f),
-                navigationIconContentColor = colors.navigationIconContentColor(scrollFraction).value,
-                titleContentColor = colors.titleContentColor(scrollFraction).value,
-                actionIconContentColor = colors.actionIconContentColor(scrollFraction).value,
+                heightPx = maxHeightPx - pinnedHeightPx + (scrollBehavior?.state?.heightOffset ?: 0f),
+                contentPadding = PaddingValues(),
+                navigationIconContentColor = colors.navigationIconContentColor(colorTransitionFraction).value,
+                titleContentColor = colors.titleContentColor(colorTransitionFraction).value,
+                actionIconContentColor = colors.actionIconContentColor(colorTransitionFraction).value,
                 title = title,
                 titleTextStyle = titleTextStyle,
                 titleAlpha = titleAlpha,
@@ -459,6 +490,7 @@ private fun TwoRowsTopAppBar(
 private fun TopAppBarLayout(
     modifier: Modifier,
     heightPx: Float,
+    contentPadding: PaddingValues,
     navigationIconContentColor: Color,
     titleContentColor: Color,
     actionIconContentColor: Color,
@@ -510,13 +542,23 @@ private fun TopAppBarLayout(
         },
         modifier = modifier,
     ) { measurables, constraints ->
-        val navigationIconPlaceable = measurables.first { it.layoutId == "navigationIcon" }.measure(constraints)
-        val actionIconsPlaceable = measurables.first { it.layoutId == "actionIcons" }.measure(constraints)
+        val navigationIconPlaceable = measurables
+            .first { it.layoutId == "navigationIcon" }
+            .measure(constraints.copy(minWidth = 0))
+        val actionIconsPlaceable = measurables
+            .first { it.layoutId == "actionIcons" }
+            .measure(constraints.copy(minWidth = 0))
 
-        val maxTitleWidth = constraints.maxWidth - navigationIconPlaceable.width - actionIconsPlaceable.width
+        val maxTitleWidth = if (constraints.maxWidth == Constraints.Infinity) {
+            constraints.maxWidth
+        } else {
+            (constraints.maxWidth - navigationIconPlaceable.width - actionIconsPlaceable.width)
+                .coerceAtLeast(0)
+        }
         val titlePlaceable = measurables
             .first { it.layoutId == "title" }
-            .measure(constraints.copy(maxWidth = maxTitleWidth))
+            .measure(constraints.copy(minWidth = 0, maxWidth = maxTitleWidth))
+
         // Locate the title's baseline.
         val titleBaseline = if (titlePlaceable[LastBaseline] != AlignmentLine.Unspecified) {
             titlePlaceable[LastBaseline]
@@ -525,12 +567,13 @@ private fun TopAppBarLayout(
         }
 
         val layoutHeight = heightPx.roundToInt()
+        val topPadding = contentPadding.calculateTopPadding().roundToPx()
 
-        layout(constraints.maxWidth, layoutHeight) {
+        layout(constraints.maxWidth, layoutHeight + topPadding) {
             // Navigation icon
             navigationIconPlaceable.placeRelative(
                 x = 0,
-                y = (layoutHeight - navigationIconPlaceable.height) / 2,
+                y = (layoutHeight - navigationIconPlaceable.height) / 2 + topPadding,
             )
 
             // Title
@@ -544,13 +587,13 @@ private fun TopAppBarLayout(
                     else -> max(TopAppBarTitleInset.roundToPx(), navigationIconPlaceable.width)
                 },
                 y = when (titleVerticalArrangement) {
-                    Arrangement.Center -> (layoutHeight - titlePlaceable.height) / 2
+                    Arrangement.Center -> (layoutHeight - titlePlaceable.height) / 2 + topPadding
                     // Apply bottom padding from the title's baseline only when the Arrangement is
                     // "Bottom".
                     Arrangement.Bottom -> if (titleBottomPadding == 0) {
-                        layoutHeight - titlePlaceable.height
+                        layoutHeight + topPadding - titlePlaceable.height
                     } else {
-                        layoutHeight - titlePlaceable.height - max(
+                        layoutHeight + topPadding - titlePlaceable.height - max(
                             0,
                             titleBottomPadding - titlePlaceable.height + titleBaseline,
                         )
@@ -563,7 +606,7 @@ private fun TopAppBarLayout(
             // Action icons
             actionIconsPlaceable.placeRelative(
                 x = constraints.maxWidth - actionIconsPlaceable.width,
-                y = (layoutHeight - actionIconsPlaceable.height) / 2,
+                y = (layoutHeight - actionIconsPlaceable.height) / 2 + topPadding,
             )
         }
     }
