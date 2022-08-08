@@ -6,7 +6,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
@@ -138,21 +137,16 @@ private fun TransformableImage(
     onTap: () -> Unit,
 ) {
     val imageSize = image.sizes.first()
+    val zoomableState = rememberZoomableState()
 
-    BoxWithConstraints(
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        val zoomableState = rememberZoomableState()
-
-        AsyncImage(
-            model = imageSize.url,
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxSize()
-                .zoomable(
-                    state = zoomableState,
-                    onTap = onTap,
-                ),
-        )
-    }
+    AsyncImage(
+        model = imageSize.url,
+        contentDescription = null,
+        modifier = Modifier
+            .fillMaxSize()
+            .zoomable(
+                state = zoomableState,
+                onTap = onTap,
+            ),
+    )
 }
