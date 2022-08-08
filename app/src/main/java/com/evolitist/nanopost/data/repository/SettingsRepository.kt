@@ -10,10 +10,10 @@ interface SettingsRepository {
     suspend fun userId(): String?
     suspend fun userId(value: String?)
 
-    suspend fun showAuth(): Boolean
     suspend fun showAuth(value: Boolean)
 
     fun authorized(): Flow<Boolean>
+    fun showAuth(): Flow<Boolean>
 
     suspend fun clear()
     fun addOnClearListener(listener: () -> Unit)

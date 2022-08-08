@@ -24,11 +24,14 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun userId() = dataStore.get(userIdKey)
     override suspend fun userId(value: String?) = dataStore.set(userIdKey, value)
 
-    override suspend fun showAuth() = dataStore.get(showAuth) ?: true
     override suspend fun showAuth(value: Boolean) = dataStore.set(showAuth, value)
 
     override fun authorized() = dataStore.data
         .map { it[authTokenKey] != null }
+        .distinctUntilChanged()
+
+    override fun showAuth() = dataStore.data
+        .map { it[showAuth] ?: true }
         .distinctUntilChanged()
 
     override suspend fun clear() {
