@@ -15,7 +15,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NanoPost.Splash"
         android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="false">
+        android:fullBackupContent="false"
+        android:enableOnBackInvokedCallback="true">
 
         <activity
             android:name=".presentation.ui.MainActivity"
