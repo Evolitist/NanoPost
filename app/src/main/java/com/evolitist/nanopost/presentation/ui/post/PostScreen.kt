@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.DropdownMenuItem
@@ -55,13 +56,16 @@ fun PostScreen(
                 },
                 title = { Text(stringResource(R.string.post)) },
                 actions = {
-                    DropdownMenuIconButton {
-                        DropdownMenuItem(
-                            leadingIcon = { Icon(Icons.Rounded.Delete, contentDescription = null) },
-                            text = { Text(stringResource(R.string.action_delete)) },
-                            onClick = { viewModel.onDeleteClick(postId, onCloseClick) },
-                        )
-                    }
+                    DropdownMenuIconButton(
+                        icon = { Icon(Icons.Default.MoreVert, contentDescription = null) },
+                        content = {
+                            DropdownMenuItem(
+                                leadingIcon = { Icon(Icons.Rounded.Delete, contentDescription = null) },
+                                text = { Text(stringResource(R.string.action_delete)) },
+                                onClick = { viewModel.onDeleteClick(postId, onCloseClick) },
+                            )
+                        },
+                    )
                 },
                 scrollBehavior = scrollBehavior,
             )

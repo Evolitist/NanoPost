@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.DropdownMenuItem
@@ -84,13 +85,16 @@ fun ImageScreen(
                     },
                     title = {},
                     actions = {
-                        DropdownMenuIconButton {
-                            DropdownMenuItem(
-                                leadingIcon = { Icon(Icons.Rounded.Delete, contentDescription = null) },
-                                text = { Text(stringResource(R.string.action_delete)) },
-                                onClick = { viewModel.onDeleteClick(imageId, onCloseClick) },
-                            )
-                        }
+                        DropdownMenuIconButton(
+                            icon = { Icon(Icons.Default.MoreVert, contentDescription = null) },
+                            content = {
+                                DropdownMenuItem(
+                                    leadingIcon = { Icon(Icons.Rounded.Delete, contentDescription = null) },
+                                    text = { Text(stringResource(R.string.action_delete)) },
+                                    onClick = { viewModel.onDeleteClick(imageId, onCloseClick) },
+                                )
+                            },
+                        )
                     },
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                         containerColor = scrimColor,
