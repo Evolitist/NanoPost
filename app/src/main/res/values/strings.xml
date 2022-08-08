@@ -6,8 +6,9 @@
     <string name="feed">Feed</string>
     <string name="search">Search</string>
     <string name="profile">Profile</string>
-    <string name="images">Images</string>
     <string name="subscribers">Subscribers</string>
+    <string name="images">Images</string>
+    <string name="posts">Posts</string>
     <string name="create">Create…</string>
     <string name="create_post">New post</string>
     <string name="create_profile">New profile</string>
