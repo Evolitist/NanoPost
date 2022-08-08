@@ -121,7 +121,7 @@ fun ImageScreen(
                         }
 
                         Header(
-                            style = HeaderStyle.Post,
+                            style = HeaderStyle.Image,
                             profile = it.owner,
                             subtitle = { Text(dateCreated) },
                         )
