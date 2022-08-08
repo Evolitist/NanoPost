@@ -23,8 +23,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.ripple.LocalRippleTheme
@@ -84,7 +89,11 @@ fun <T> SmallFABLayout(
         transitionSpec = { tween(easing = FastOutSlowInEasing) },
         targetValueByState = { if (it) .9f else 0f },
     )
-    Box {
+    Box(
+        modifier = modifier.padding(
+            WindowInsets.safeContent.only(WindowInsetsSides.Bottom).asPaddingValues()
+        ),
+    ) {
         ExpandingFAB(
             transition = transition,
             fabContainerColor = fabContainerColor,
@@ -179,7 +188,12 @@ private fun <T> SmallFABLayoutPopupContents(
             }
         }
 
-        expandingFab()
+        transition.AnimatedVisibility(
+            visible = { it },
+            enter = fadeIn(animationSpec = tween()),
+            exit = fadeOut(animationSpec = tween()),
+            content = { expandingFab() },
+        )
     }
 }
 
@@ -252,7 +266,7 @@ private fun buttonEnterTransition(index: Int): EnterTransition {
 
 private object EmptyRippleTheme : RippleTheme {
     @Composable
-    override fun defaultColor() = MaterialTheme.colorScheme.surface
+    override fun defaultColor() = Color.Transparent
 
     @Composable
     override fun rippleAlpha() = RippleAlpha(0f, 0f, 0f, 0f)
