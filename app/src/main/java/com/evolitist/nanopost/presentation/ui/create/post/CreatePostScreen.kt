@@ -1,6 +1,5 @@
 package com.evolitist.nanopost.presentation.ui.create.post
 
-import android.content.res.Configuration
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -58,12 +57,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.work.WorkManager
 import coil.compose.AsyncImage
 import com.evolitist.nanopost.R
-import com.evolitist.nanopost.presentation.ui.theme.AppTheme
 import com.evolitist.nanopost.presentation.ui.view.CenterAlignedTopAppBar
 import com.evolitist.nanopost.presentation.utils.ParcelableListSaver
 import com.evolitist.nanopost.presentation.worker.CreatePostWorker
@@ -226,33 +223,5 @@ fun <T> RemovableImage(
                 modifier = Modifier.size(24.dp),
             )
         }
-    }
-}
-
-@Composable
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
-fun RemovableImage_Preview() {
-    AppTheme {
-        RemovableImage(
-            image = R.color.ic_launcher_background,
-            onCancelClick = {},
-            modifier = Modifier.height(184.dp),
-        )
-    }
-}
-
-@Composable
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
-fun ImagesRow_Preview() {
-    AppTheme {
-        ImagesRow(
-            images = remember {
-                mutableStateListOf(
-                    R.color.ic_launcher_background,
-                )
-            },
-            onCancelClick = {},
-            modifier = Modifier.height(192.dp),
-        )
     }
 }
