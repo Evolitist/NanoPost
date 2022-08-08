@@ -7,21 +7,29 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.evolitist.nanopost.domain.model.Profile
 
+enum class ProfileButtonState {
+    Edit, Subscribe, Unsubscribe
+}
+
 @Composable
 fun ProfileCard(
     profile: Profile,
-    buttonText: String,
+    buttonState: ProfileButtonState,
     onSubscribersClick: () -> Unit,
+    onImagesClick: () -> Unit,
+    onPostsClick: () -> Unit,
     onButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -41,7 +49,9 @@ fun ProfileCard(
             Divider(color = MaterialTheme.colorScheme.surfaceVariant)
 
             Row(
-                modifier = Modifier.fillMaxWidth().height(80.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp),
             ) {
                 Counter(
                     count = profile.subscribersCount,
@@ -54,24 +64,41 @@ fun ProfileCard(
                 Counter(
                     count = profile.imagesCount,
                     description = "images",
-                    modifier = Modifier.fillMaxHeight().weight(1f),
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f)
+                        .clickable(onClick = onImagesClick),
                 )
                 Counter(
                     count = profile.postsCount,
                     description = "posts",
-                    modifier = Modifier.fillMaxHeight().weight(1f),
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f)
+                        .clickable(onClick = onPostsClick),
                 )
             }
 
             Divider(color = MaterialTheme.colorScheme.surfaceVariant)
 
-            FilledTonalButton(
-                onClick = onButtonClick,
-                content = { Text(buttonText) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-            )
+            val buttonModifier = Modifier.fillMaxWidth().padding(16.dp)
+            when (buttonState) {
+                ProfileButtonState.Edit -> FilledTonalButton(
+                    onClick = onButtonClick,
+                    content = { Text("Edit") },
+                    modifier = buttonModifier,
+                )
+                ProfileButtonState.Subscribe -> Button(
+                    onClick = onButtonClick,
+                    content = { Text("Subscribe") },
+                    modifier = buttonModifier,
+                )
+                ProfileButtonState.Unsubscribe -> OutlinedButton(
+                    onClick = onButtonClick,
+                    content = { Text("Unsubscribe") },
+                    modifier = buttonModifier,
+                )
+            }
         }
     }
 }

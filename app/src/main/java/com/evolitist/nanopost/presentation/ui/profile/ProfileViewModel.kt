@@ -8,6 +8,8 @@ import androidx.paging.cachedIn
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.evolitist.nanopost.domain.usecase.GetPostsUseCase
 import com.evolitist.nanopost.domain.usecase.GetProfileUseCase
+import com.evolitist.nanopost.domain.usecase.SubscribeToProfileUseCase
+import com.evolitist.nanopost.domain.usecase.UnsubscribeFromProfileUseCase
 import com.evolitist.nanopost.presentation.extensions.mapData
 import com.evolitist.nanopost.presentation.extensions.withHeaders
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +17,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @Stable
@@ -22,6 +25,8 @@ import javax.inject.Inject
 class ProfileViewModel @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
     private val getPostsUseCase: GetPostsUseCase,
+    private val subscribeToProfileUseCase: SubscribeToProfileUseCase,
+    private val unsubscribeFromProfileUseCase: UnsubscribeFromProfileUseCase,
 ) : ViewModel() {
 
     private val profileIdFlow = MutableStateFlow<String?>(null)
@@ -44,5 +49,23 @@ class ProfileViewModel @Inject constructor(
 
     fun setProfileId(profileId: String?) {
         profileIdFlow.value = profileId
+    }
+
+    fun subscribe(callback: () -> Unit) {
+        profileIdFlow.value?.let { profileId ->
+            viewModelScope.launch {
+                subscribeToProfileUseCase(profileId)
+                callback()
+            }
+        }
+    }
+
+    fun unsubscribe(callback: () -> Unit) {
+        profileIdFlow.value?.let { profileId ->
+            viewModelScope.launch {
+                unsubscribeFromProfileUseCase(profileId)
+                callback()
+            }
+        }
     }
 }
