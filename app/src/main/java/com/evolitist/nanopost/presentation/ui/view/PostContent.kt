@@ -1,7 +1,6 @@
 package com.evolitist.nanopost.presentation.ui.view
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,12 +31,13 @@ fun PostContent(
     isStandalone: Boolean = true,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = modifier.padding(top = 16.dp, bottom = if (post.images.isEmpty()) 16.dp else 0.dp),
+        modifier = modifier.padding(bottom = if (post.images.isEmpty()) 16.dp else 0.dp),
     ) {
         val dateCreated = remember(post.dateCreated) {
             SimpleDateFormat.getDateTimeInstance().format(post.dateCreated)
         }
+
+        val hasText = remember(post.text) { !post.text.isNullOrBlank() }
 
         Header(
             style = HeaderStyle.Post,
@@ -46,7 +46,7 @@ fun PostContent(
             onClick = { onHeaderClick(post.owner.id) },
         )
 
-        if (!post.text.isNullOrEmpty()) {
+        if (!post.text.isNullOrBlank()) {
             val text = @Composable {
                 Text(
                     text = post.text,
@@ -68,7 +68,15 @@ fun PostContent(
                 HorizontalPager(
                     count = post.images.size,
                     key = { post.images[it].id },
-                    modifier = Modifier.aspectRatio(1f),
+                    modifier = Modifier
+                        .aspectRatio(1f)
+                        .then(
+                            if (hasText) {
+                                Modifier.padding(top = 16.dp)
+                            } else {
+                                Modifier
+                            }
+                        ),
                 ) {
                     val image = post.images[it]
                     AsyncImage(
@@ -93,6 +101,13 @@ fun PostContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(1f)
+                            .then(
+                                if (hasText) {
+                                    Modifier.padding(top = 16.dp)
+                                } else {
+                                    Modifier
+                                }
+                            )
                             .clickable {
                                 onImageClick(image.id)
                             },
