@@ -37,7 +37,13 @@ fun rememberZoomableState(): ZoomableState {
         offset.value += panChange
     }
 
-    return remember { DefaultZoomableState(transformableState, zoom, offset) }
+    return remember {
+        DefaultZoomableState(
+            transformableState = transformableState,
+            zoomState = zoom,
+            offsetState = offset,
+        )
+    }
 }
 
 fun Modifier.zoomable(
@@ -105,7 +111,7 @@ private class DefaultZoomableState(
     ) {
         val oldScale = zoomState.value
         val newScale = (zoomState.value * zoom).coerceIn(1f, 3f)
-        val gestureOffset = (centroid / oldScale) - (centroid / newScale + pan / oldScale)
+        val gestureOffset = calculatePanChange(pan, centroid, oldScale, newScale)
 
         transformableState.zoomBy(zoom)
         transformableState.panBy(gestureOffset)
@@ -125,10 +131,19 @@ private class DefaultZoomableState(
             AnimationState(initialValue = previousZoom).animateTo(zoom) {
                 val scaleFactor = if (previousZoom == 0f) 1f else this.value / previousZoom
                 transformBy(zoomChange = scaleFactor)
-                val delta = (adjustedCentroid / previousZoom) - (adjustedCentroid / this.value + pan / previousZoom)
+                val delta = calculatePanChange(pan, adjustedCentroid, previousZoom, this.value)
                 transformBy(panChange = delta)
                 previousZoom = this.value
             }
         }
+    }
+
+    private fun calculatePanChange(
+        pan: Offset,
+        centroid: Offset,
+        oldScale: Float,
+        newScale: Float,
+    ): Offset {
+        return (centroid / oldScale) - (centroid / newScale + pan / oldScale)
     }
 }
