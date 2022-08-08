@@ -2,6 +2,7 @@ package com.evolitist.nanopost.presentation.ui.create.post
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -75,7 +76,7 @@ fun CreatePostScreen(
 
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let(images::add)
     }
 
@@ -140,7 +141,11 @@ fun CreatePostScreen(
                     .padding(horizontal = 16.dp),
             ) {
                 AssistChip(
-                    onClick = { imagePicker.launch("image/*") },
+                    onClick = {
+                        imagePicker.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        )
+                    },
                     leadingIcon = { Icon(Icons.Rounded.AddPhotoAlternate, null, ) },
                     label = { Text("Add image...") },
                 )

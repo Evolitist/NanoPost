@@ -61,7 +61,7 @@ fun CreateProfileScreen(
 
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let { avatarUri = it }
     }
 
