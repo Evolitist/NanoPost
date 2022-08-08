@@ -23,7 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarScrollState
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,7 +65,7 @@ fun CreateProfileScreen(
         uri?.let { avatarUri = it }
     }
 
-    val topAppBarState = rememberTopAppBarScrollState()
+    val topAppBarState = rememberTopAppBarState()
     val scrollBehavior = remember(topAppBarState) {
         TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
     }

@@ -38,7 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarScrollState
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -80,7 +80,7 @@ fun CreatePostScreen(
         uri?.let(images::add)
     }
 
-    val topAppBarState = rememberTopAppBarScrollState()
+    val topAppBarState = rememberTopAppBarState()
     val scrollBehavior = remember(topAppBarState) {
         TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
     }
