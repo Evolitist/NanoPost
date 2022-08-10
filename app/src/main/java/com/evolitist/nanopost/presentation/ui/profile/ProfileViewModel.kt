@@ -1,11 +1,9 @@
 package com.evolitist.nanopost.presentation.ui.profile
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.evolitist.nanopost.domain.usecase.GetPostsUseCase
 import com.evolitist.nanopost.domain.usecase.GetProfileUseCase
 import com.evolitist.nanopost.domain.usecase.SubscribeToProfileUseCase
@@ -40,12 +38,11 @@ class ProfileViewModel @Inject constructor(
             )
         }
 
-    private val profilePagingDataFlow = profileIdFlow
+    val profilePagingDataFlow = profileIdFlow
         .flatMapLatest { getPostsUseCase(it) }
         .mapData { ProfileElement.post(it) }
         .withHeaders { profileFlow }
         .cachedIn(viewModelScope)
-    val profilePagingItems @Composable get() = profilePagingDataFlow.collectAsLazyPagingItems()
 
     fun setProfileId(profileId: String?) {
         profileIdFlow.value = profileId

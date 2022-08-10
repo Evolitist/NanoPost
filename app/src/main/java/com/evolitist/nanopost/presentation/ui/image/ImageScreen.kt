@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,7 +54,7 @@ fun ImageScreen(
 ) {
     var showBars by remember { mutableStateOf(true) }
     val overlay = updateTransition(showBars, label = "Overlay transition")
-    val image by viewModel.imageState
+    val image by viewModel.imageStateFlow.collectAsState()
 
     LaunchedEffect(imageId) {
         viewModel.setImageId(imageId)

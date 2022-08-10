@@ -16,6 +16,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -35,7 +36,7 @@ fun PostScreen(
     onImageClick: (String) -> Unit,
     onProfileClick: (String) -> Unit,
 ) {
-    val post by viewModel.postState
+    val post by viewModel.postStateFlow.collectAsState()
 
     LaunchedEffect(postId) {
         viewModel.setPostId(postId)

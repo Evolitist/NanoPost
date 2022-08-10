@@ -28,6 +28,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.evolitist.nanopost.presentation.extensions.items
 import com.evolitist.nanopost.presentation.extensions.loadState
 import com.evolitist.nanopost.presentation.ui.create.CreateActions
@@ -56,7 +57,7 @@ fun ProfileScreen(
     onImageClick: (String) -> Unit,
     onProfileClick: (String) -> Unit,
 ) {
-    val data = viewModel.profilePagingItems
+    val data = viewModel.profilePagingDataFlow.collectAsLazyPagingItems()
     val swipeRefreshState = rememberSwipeRefreshState(
         data.loadState.refresh == LoadState.Loading
     )

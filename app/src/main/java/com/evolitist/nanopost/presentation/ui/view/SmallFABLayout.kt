@@ -42,6 +42,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -264,6 +265,7 @@ private fun buttonEnterTransition(index: Int): EnterTransition {
     ) { it / 2 }
 }
 
+@Immutable
 private object EmptyRippleTheme : RippleTheme {
     @Composable
     override fun defaultColor() = Color.Transparent

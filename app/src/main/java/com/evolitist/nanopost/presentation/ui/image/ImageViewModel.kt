@@ -1,8 +1,6 @@
 package com.evolitist.nanopost.presentation.ui.image
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.evolitist.nanopost.domain.usecase.DeleteImageUseCase
@@ -25,11 +23,10 @@ class ImageViewModel @Inject constructor(
 
     private val imageIdFlow = MutableStateFlow<String?>(null)
 
-    private val imageStateFlow = imageIdFlow
+    val imageStateFlow = imageIdFlow
         .filterNotNull()
         .mapLatest { getImageUseCase(it) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
-    val imageState @Composable get() = imageStateFlow.collectAsState()
 
     fun setImageId(imageId: String) {
         imageIdFlow.value = imageId

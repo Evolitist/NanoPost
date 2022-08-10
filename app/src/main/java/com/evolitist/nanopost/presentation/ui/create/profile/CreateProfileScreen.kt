@@ -117,7 +117,7 @@ fun CreateProfileScreen(
                         },
                     )
                     1 -> ProfileDataPage(
-                        avatarUri = avatarUri,
+                        avatarUri = avatarUri?.toString(),
                         displayName = displayName,
                         onDisplayNameChange = setDisplayName,
                         bio = bio,
@@ -175,7 +175,7 @@ fun UsernamePage(
 
 @Composable
 fun ProfileDataPage(
-    avatarUri: Uri?,
+    avatarUri: String?,
     displayName: String,
     onDisplayNameChange: (String) -> Unit,
     bio: String,

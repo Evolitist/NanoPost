@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.evolitist.nanopost.R
 import com.evolitist.nanopost.presentation.extensions.items
 import com.evolitist.nanopost.presentation.extensions.loadState
@@ -41,7 +42,7 @@ fun SubscribersScreen(
     onCloseClick: () -> Unit,
     onProfileClick: (String) -> Unit,
 ) {
-    val data = viewModel.subscribersPagingItems
+    val data = viewModel.subscribersPagingDataFlow.collectAsLazyPagingItems()
     val swipeRefreshState = rememberSwipeRefreshState(
         data.loadState.refresh == LoadState.Loading
     )

@@ -1,8 +1,6 @@
 package com.evolitist.nanopost.presentation.ui.post
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.evolitist.nanopost.domain.usecase.DeletePostUseCase
@@ -25,11 +23,10 @@ class PostViewModel @Inject constructor(
 
     private val postIdFlow = MutableStateFlow<String?>(null)
 
-    private val postStateFlow = postIdFlow
+    val postStateFlow = postIdFlow
         .filterNotNull()
         .mapLatest { getPostUseCase(it) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
-    val postState @Composable get() = postStateFlow.collectAsState()
 
     fun setPostId(postId: String) {
         postIdFlow.value = postId

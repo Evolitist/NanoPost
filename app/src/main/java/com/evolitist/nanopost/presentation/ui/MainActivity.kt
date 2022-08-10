@@ -4,9 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.CompositionLocal
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import com.evolitist.nanopost.presentation.ui.theme.AppTheme
@@ -28,17 +25,9 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            CompositionLocalProvider(ProvidableLocalActivityViewModel provides viewModel) {
-                AppTheme {
-                    AppNavGraph()
-                }
+            AppTheme {
+                AppNavGraph()
             }
         }
     }
 }
-
-@Suppress("CompositionLocalNaming")
-private val ProvidableLocalActivityViewModel = staticCompositionLocalOf<MainViewModel> {
-    error("Activity ViewModel was not provided in this scope")
-}
-val LocalActivityViewModel: CompositionLocal<MainViewModel> = ProvidableLocalActivityViewModel

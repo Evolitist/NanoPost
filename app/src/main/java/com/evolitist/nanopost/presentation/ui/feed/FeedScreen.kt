@@ -29,12 +29,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.evolitist.nanopost.R
 import com.evolitist.nanopost.presentation.extensions.copy
 import com.evolitist.nanopost.presentation.extensions.loadState
-import com.evolitist.nanopost.presentation.ui.LocalActivityViewModel
+import com.evolitist.nanopost.presentation.ui.MainViewModel
 import com.evolitist.nanopost.presentation.ui.create.CreateActions
 import com.evolitist.nanopost.presentation.ui.view.Avatar
 import com.evolitist.nanopost.presentation.ui.view.FloatingAppBar
@@ -54,7 +56,7 @@ fun FeedScreen(
     onProfileClick: (String?) -> Unit,
     onImageClick: (String) -> Unit,
 ) {
-    val data = viewModel.feedPagingItems
+    val data = viewModel.feedPagingDataFlow.collectAsLazyPagingItems()
     val swipeRefreshState = rememberSwipeRefreshState(
         data.loadState.refresh == LoadState.Loading
     )
@@ -65,7 +67,7 @@ fun FeedScreen(
     }
     Scaffold(
         topBar = {
-            val activityViewModel = LocalActivityViewModel.current
+            val activityViewModel = viewModel<MainViewModel>()
             val profile by activityViewModel.profileFlow.collectAsState()
 
             FloatingAppBar(

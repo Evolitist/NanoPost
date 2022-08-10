@@ -1,7 +1,9 @@
 package com.evolitist.nanopost.domain.model
 
+import androidx.compose.runtime.Immutable
 import kotlinx.collections.immutable.ImmutableList
 
+@Immutable
 data class Profile(
     override val id: String,
     val username: String,

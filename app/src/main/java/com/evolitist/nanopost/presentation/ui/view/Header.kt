@@ -1,5 +1,6 @@
 package com.evolitist.nanopost.presentation.ui.view
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -106,7 +107,7 @@ fun Avatar(
 
 @Composable
 fun Avatar(
-    model: Any?,
+    model: String?,
     monogram: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -117,8 +118,11 @@ fun Avatar(
             .background(MaterialTheme.colorScheme.primary),
     ) {
         if (model != null) {
+            val uri = remember(model) {
+                Uri.parse(model) ?: model
+            }
             AsyncImage(
-                model = model,
+                model = uri,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),

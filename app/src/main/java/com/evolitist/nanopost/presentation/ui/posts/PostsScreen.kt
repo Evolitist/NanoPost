@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.evolitist.nanopost.R
 import com.evolitist.nanopost.presentation.extensions.loadState
@@ -40,7 +41,7 @@ fun PostsScreen(
     onProfileClick: (String) -> Unit,
     onImageClick: (String) -> Unit,
 ) {
-    val data = viewModel.postsPagingItems
+    val data = viewModel.postsPagingDataFlow.collectAsLazyPagingItems()
     val swipeRefreshState = rememberSwipeRefreshState(
         data.loadState.refresh == LoadState.Loading
     )
