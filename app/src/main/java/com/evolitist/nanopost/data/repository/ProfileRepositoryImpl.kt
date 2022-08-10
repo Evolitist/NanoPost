@@ -3,7 +3,6 @@ package com.evolitist.nanopost.data.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.map
 import com.evolitist.nanopost.data.network.NanoPostApiService
 import com.evolitist.nanopost.data.paging.StringKeyedPagingSource
 import com.evolitist.nanopost.domain.mapper.ProfileCompactMapper
@@ -11,8 +10,8 @@ import com.evolitist.nanopost.domain.mapper.ProfileMapper
 import com.evolitist.nanopost.domain.model.ImageInfo
 import com.evolitist.nanopost.domain.model.Profile
 import com.evolitist.nanopost.domain.model.ProfileCompact
+import com.evolitist.nanopost.presentation.extensions.mapData
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class ProfileRepositoryImpl @Inject constructor(
@@ -30,7 +29,7 @@ class ProfileRepositoryImpl @Inject constructor(
         displayName: String?,
         bio: String?,
         avatar: ImageInfo?,
-        progressCallback: (Float) -> Unit
+        progressCallback: (Float) -> Unit,
     ): Profile {
         return apiService.putProfile(
             username = username,
@@ -46,9 +45,7 @@ class ProfileRepositoryImpl @Inject constructor(
             StringKeyedPagingSource { count, offset ->
                 apiService.getSubscribers(profileId, count, offset)
             }
-        }.flow.map {
-            it.map(profileCompactMapper::fromApiToModel)
-        }
+        }.flow.mapData(profileCompactMapper::fromApiToModel)
     }
 
     override suspend fun subscribe(profileId: String) {
