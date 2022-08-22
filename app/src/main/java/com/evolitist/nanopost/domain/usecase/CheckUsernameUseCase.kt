@@ -1,7 +1,7 @@
 package com.evolitist.nanopost.domain.usecase
 
-import com.evolitist.nanopost.domain.model.UsernameCheckResult
 import com.evolitist.nanopost.data.repository.AuthRepository
+import com.evolitist.nanopost.domain.model.UsernameCheckResult
 import javax.inject.Inject
 
 class CheckUsernameUseCase @Inject constructor(

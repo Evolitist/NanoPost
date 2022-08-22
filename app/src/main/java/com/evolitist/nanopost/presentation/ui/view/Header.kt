@@ -49,7 +49,6 @@ fun Header(
        profile.displayName ?: profile.username
     }
 
-    // TODO wait for container color to actually be used
     ListItem(
         leadingContent = {
             Avatar(

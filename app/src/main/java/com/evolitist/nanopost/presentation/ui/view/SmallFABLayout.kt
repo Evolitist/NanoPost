@@ -42,8 +42,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -95,22 +96,30 @@ fun <T> SmallFABLayout(
             WindowInsets.safeContent.only(WindowInsetsSides.Bottom).asPaddingValues()
         ),
     ) {
+        val showOverlay by remember {
+            derivedStateOf { layoutExpanded.currentState || layoutExpanded.targetState }
+        }
+
         ExpandingFAB(
             transition = transition,
             fabContainerColor = fabContainerColor,
             fabContentColor = fabContentColor,
             iconRotation = iconRotation,
+            elevation = 6.dp - fabElevation,
             onClick = { layoutExpanded.targetState = true },
             content = content,
         )
 
-        if (layoutExpanded.currentState || layoutExpanded.targetState) {
-            val scrimColor = MaterialTheme.colorScheme.surface
+        if (showOverlay) {
             Popup {
+                val scrimColor = MaterialTheme.colorScheme.surface
                 val systemUiController = rememberSystemUiController()
 
-                SideEffect {
+                DisposableEffect(systemUiController, scrimColor, scrimAlpha) {
                     systemUiController.setSystemBarsColor(scrimColor.copy(alpha = scrimAlpha))
+
+                    onDispose {
+                    }
                 }
 
                 Box(
@@ -189,12 +198,14 @@ private fun <T> SmallFABLayoutPopupContents(
             }
         }
 
-        transition.AnimatedVisibility(
+        // TODO figure out better approach
+        expandingFab()
+        /*transition.AnimatedVisibility(
             visible = { it },
             enter = fadeIn(animationSpec = tween()),
             exit = fadeOut(animationSpec = tween()),
             content = { expandingFab() },
-        )
+        )*/
     }
 }
 
@@ -268,7 +279,7 @@ private fun buttonEnterTransition(index: Int): EnterTransition {
 @Immutable
 private object EmptyRippleTheme : RippleTheme {
     @Composable
-    override fun defaultColor() = Color.Transparent
+    override fun defaultColor() = MaterialTheme.colorScheme.surface
 
     @Composable
     override fun rippleAlpha() = RippleAlpha(0f, 0f, 0f, 0f)

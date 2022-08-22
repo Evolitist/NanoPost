@@ -32,6 +32,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.evolitist.nanopost.R
+import com.evolitist.nanopost.domain.model.Image
 import com.evolitist.nanopost.presentation.extensions.items
 import com.evolitist.nanopost.presentation.extensions.loadState
 import com.evolitist.nanopost.presentation.ui.view.CenterAlignedTopAppBar
@@ -87,7 +88,7 @@ fun ImagesScreen(
             ) {
                 items(
                     items = data,
-                    key = { it.id },
+                    key = Image::id,
                 ) { image ->
                     Box(
                         modifier = Modifier
@@ -96,7 +97,7 @@ fun ImagesScreen(
                     ) {
                         if (image != null) {
                             AsyncImage(
-                                image.sizes.last().url,
+                                model = image.sizes.last().url,
                                 fallback = ColorPainter(MaterialTheme.colorScheme.surfaceVariant),
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,

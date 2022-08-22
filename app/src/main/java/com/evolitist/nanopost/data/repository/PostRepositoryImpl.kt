@@ -5,10 +5,10 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.evolitist.nanopost.data.network.NanoPostApiService
-import com.evolitist.nanopost.domain.mapper.PostMapper
-import com.evolitist.nanopost.domain.model.Post
 import com.evolitist.nanopost.data.paging.StringKeyedPagingSource
+import com.evolitist.nanopost.domain.mapper.PostMapper
 import com.evolitist.nanopost.domain.model.ImageInfo
+import com.evolitist.nanopost.domain.model.Post
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

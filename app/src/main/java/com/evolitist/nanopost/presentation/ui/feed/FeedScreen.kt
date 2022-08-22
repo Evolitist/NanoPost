@@ -34,17 +34,18 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.evolitist.nanopost.R
+import com.evolitist.nanopost.domain.model.Post
 import com.evolitist.nanopost.presentation.extensions.copy
 import com.evolitist.nanopost.presentation.extensions.loadState
 import com.evolitist.nanopost.presentation.ui.MainViewModel
 import com.evolitist.nanopost.presentation.ui.create.CreateActions
 import com.evolitist.nanopost.presentation.ui.view.Avatar
 import com.evolitist.nanopost.presentation.ui.view.FloatingAppBar
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.evolitist.nanopost.presentation.ui.view.PostCard
 import com.evolitist.nanopost.presentation.ui.view.SmallFABLayout
 import com.evolitist.nanopost.presentation.ui.view.floatingScrollBehavior
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
@@ -139,7 +140,7 @@ fun FeedScreen(
             ) {
                 items(
                     items = data,
-                    key = { it.id },
+                    key = Post::id,
                 ) { post ->
                     post?.let {
                         PostCard(

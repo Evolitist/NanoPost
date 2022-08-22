@@ -1,7 +1,7 @@
 package com.evolitist.nanopost.domain.mapper
 
-import com.evolitist.nanopost.domain.model.Image
 import com.evolitist.nanopost.data.network.model.ApiImage
+import com.evolitist.nanopost.domain.model.Image
 import kotlinx.collections.immutable.toImmutableList
 import javax.inject.Inject
 

@@ -26,11 +26,12 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.evolitist.nanopost.R
+import com.evolitist.nanopost.domain.model.Post
 import com.evolitist.nanopost.presentation.extensions.loadState
 import com.evolitist.nanopost.presentation.ui.view.CenterAlignedTopAppBar
+import com.evolitist.nanopost.presentation.ui.view.PostCard
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.evolitist.nanopost.presentation.ui.view.PostCard
 
 @Composable
 fun PostsScreen(
@@ -82,7 +83,7 @@ fun PostsScreen(
             ) {
                 items(
                     items = data,
-                    key = { it.id },
+                    key = Post::id,
                 ) { post ->
                     post?.let {
                         PostCard(

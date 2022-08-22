@@ -1,5 +1,6 @@
 package com.evolitist.nanopost.presentation.ui
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.evolitist.nanopost.domain.usecase.CheckIsAuthorizedUseCase
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Stable
 @HiltViewModel
 class MainViewModel @Inject constructor(
     checkShowAuthUseCase: CheckShowAuthUseCase,

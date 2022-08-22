@@ -28,6 +28,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.evolitist.nanopost.R
+import com.evolitist.nanopost.domain.model.ProfileCompact
 import com.evolitist.nanopost.presentation.extensions.items
 import com.evolitist.nanopost.presentation.extensions.loadState
 import com.evolitist.nanopost.presentation.ui.view.Avatar
@@ -81,7 +82,7 @@ fun SubscribersScreen(
             ) {
                 items(
                     items = data,
-                    key = { it.id },
+                    key = ProfileCompact::id,
                 ) { profile ->
                     profile?.let {
                         ListItem(

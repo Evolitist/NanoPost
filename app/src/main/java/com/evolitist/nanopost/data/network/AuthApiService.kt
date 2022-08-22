@@ -2,12 +2,11 @@ package com.evolitist.nanopost.data.network
 
 import com.evolitist.nanopost.data.extensions.query
 import com.evolitist.nanopost.data.network.model.ApiUsernameCheckResult
-import com.evolitist.nanopost.data.network.model.response.TokenResponse
 import com.evolitist.nanopost.data.network.model.request.RegisterRequest
 import com.evolitist.nanopost.data.network.model.response.ObjectResponse
+import com.evolitist.nanopost.data.network.model.response.TokenResponse
 import com.evolitist.nanopost.di.AuthClient
 import io.ktor.client.HttpClient
-import io.ktor.client.request.parameter
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
