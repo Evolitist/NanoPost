@@ -26,7 +26,6 @@ import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.TopAppBarState
-import androidx.compose.material3.TwoRowsTopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
@@ -164,10 +163,9 @@ fun FloatingAppBar(
  * @param titleTextStyle the title's text style
  * @param modifier a [Modifier]
  * @param titleHorizontalArrangement the title's horizontal arrangement
- * @param hideTitleSemantics hides the title node from the semantic tree. Apply this
- * boolean when this layout is part of a [TwoRowsTopAppBar] to hide the title's semantics
- * from accessibility services. This is needed to avoid having multiple titles visible to
- * accessibility services at the same time, when animating between collapsed / expanded states.
+ * @param hideTitleSemantics hides the title node from the semantic tree. This is needed to avoid
+ * having multiple titles visible to accessibility services at the same time, when animating between
+ * collapsed / expanded states.
  * @param navigationIcon a navigation icon [Composable]
  * @param actions actions [Composable]
  */
