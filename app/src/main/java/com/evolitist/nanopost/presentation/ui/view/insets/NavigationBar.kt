@@ -1,4 +1,4 @@
-package com.evolitist.nanopost.presentation.ui.view
+package com.evolitist.nanopost.presentation.ui.view.insets
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectableGroup
@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
  * @param tonalElevation When [containerColor] is [ColorScheme.surface], a higher tonal elevation
  * value will result in a darker color in light theme and lighter color in dark theme. See also:
  * [Surface].
+ * @param windowInsets a window insets of the navigation bar.
  * @param content destinations inside this NavigationBar. This should contain multiple
  * [NavigationBarItem]s
  */
@@ -42,7 +43,7 @@ fun NavigationBar(
     containerColor: Color = MaterialTheme.colorScheme.surface,
     contentColor: Color = MaterialTheme.colorScheme.contentColorFor(containerColor),
     tonalElevation: Dp = 3.dp,
-    contentPadding: PaddingValues = WindowInsets.navigationBars.only(WindowInsetsSides.Bottom).asPaddingValues(),
+    windowInsets: WindowInsets = NavigationBarDefaults.windowInsets,
     content: @Composable RowScope.() -> Unit,
 ) {
     Surface(
@@ -53,8 +54,8 @@ fun NavigationBar(
     ) {
         Row(
             modifier = Modifier
-                .padding(contentPadding)
                 .fillMaxWidth()
+                .windowInsetsPadding(windowInsets)
                 .height(NavigationBarHeight)
                 .selectableGroup(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -62,5 +63,13 @@ fun NavigationBar(
         )
     }
 }
+
+/**
+ * Default window insets to be used and consumed by navigation bar
+ */
+val NavigationBarDefaults.windowInsets: WindowInsets
+    @Composable
+    get() = WindowInsets.safeDrawing
+        .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
 
 private val NavigationBarHeight: Dp = 80.dp

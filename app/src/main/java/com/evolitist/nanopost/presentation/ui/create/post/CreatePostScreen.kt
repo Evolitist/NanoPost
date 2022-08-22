@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -33,19 +32,16 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -62,7 +58,8 @@ import androidx.compose.ui.unit.dp
 import androidx.work.WorkManager
 import coil.compose.AsyncImage
 import com.evolitist.nanopost.R
-import com.evolitist.nanopost.presentation.ui.view.CenterAlignedTopAppBar
+import com.evolitist.nanopost.presentation.ui.view.insets.CenterAlignedTopAppBar
+import com.evolitist.nanopost.presentation.ui.view.insets.Scaffold
 import com.evolitist.nanopost.presentation.utils.ParcelableListSaver
 import com.evolitist.nanopost.presentation.worker.CreatePostWorker
 
@@ -71,7 +68,7 @@ import com.evolitist.nanopost.presentation.worker.CreatePostWorker
 fun CreatePostScreen(
     onCloseClick: () -> Unit,
 ) {
-    var text by rememberSaveable { mutableStateOf("") }
+    val (text, setText) = rememberSaveable { mutableStateOf("") }
     val images = rememberSaveable(saver = ParcelableListSaver()) { mutableStateListOf<Uri>() }
 
     val context = LocalContext.current
@@ -108,7 +105,6 @@ fun CreatePostScreen(
                 scrollBehavior = scrollBehavior,
             )
         },
-        modifier = Modifier.imePadding(),
     ) { padding ->
         Column(
             modifier = Modifier.padding(padding),
@@ -121,7 +117,7 @@ fun CreatePostScreen(
             ) {
                 TextField(
                     value = text,
-                    onValueChange = { text = it },
+                    onValueChange = setText,
                     colors = TextFieldDefaults.textFieldColors(
                         containerColor = Color.Transparent,
                         focusedIndicatorColor = Color.Transparent,
@@ -146,7 +142,7 @@ fun CreatePostScreen(
                             PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                         )
                     },
-                    leadingIcon = { Icon(Icons.Rounded.AddPhotoAlternate, null, ) },
+                    leadingIcon = { Icon(Icons.Rounded.AddPhotoAlternate, contentDescription = null) },
                     label = { Text("Add image...") },
                 )
             }
@@ -218,7 +214,7 @@ fun <T> RemovableImage(
                 ) { onCancelClick(image) },
         ) {
             Box(
-                Modifier
+                modifier = Modifier
                     .size(12.dp)
                     .background(MaterialTheme.colorScheme.background),
             )

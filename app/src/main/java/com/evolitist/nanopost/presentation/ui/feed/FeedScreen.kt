@@ -12,7 +12,6 @@ import androidx.compose.material.icons.rounded.PostAdd
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -44,6 +43,7 @@ import com.evolitist.nanopost.presentation.ui.view.FloatingAppBar
 import com.evolitist.nanopost.presentation.ui.view.PostCard
 import com.evolitist.nanopost.presentation.ui.view.SmallFABLayout
 import com.evolitist.nanopost.presentation.ui.view.floatingScrollBehavior
+import com.evolitist.nanopost.presentation.ui.view.insets.Scaffold
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.collections.immutable.persistentListOf

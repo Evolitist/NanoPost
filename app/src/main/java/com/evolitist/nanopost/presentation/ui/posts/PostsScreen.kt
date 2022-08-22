@@ -9,7 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
@@ -28,8 +27,9 @@ import androidx.paging.compose.items
 import com.evolitist.nanopost.R
 import com.evolitist.nanopost.domain.model.Post
 import com.evolitist.nanopost.presentation.extensions.loadState
-import com.evolitist.nanopost.presentation.ui.view.CenterAlignedTopAppBar
 import com.evolitist.nanopost.presentation.ui.view.PostCard
+import com.evolitist.nanopost.presentation.ui.view.insets.CenterAlignedTopAppBar
+import com.evolitist.nanopost.presentation.ui.view.insets.Scaffold
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 

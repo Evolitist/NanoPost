@@ -6,13 +6,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -40,6 +38,7 @@ import com.evolitist.nanopost.R
 import com.evolitist.nanopost.domain.model.UsernameCheckResult
 import com.evolitist.nanopost.presentation.ui.view.HelperTextField
 import com.evolitist.nanopost.presentation.ui.view.autofill
+import com.evolitist.nanopost.presentation.ui.view.insets.Scaffold
 import kotlinx.collections.immutable.persistentListOf
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -81,8 +80,7 @@ fun AuthScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(32.dp)
-                .imePadding(),
+                .padding(32.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

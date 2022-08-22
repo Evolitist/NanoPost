@@ -40,10 +40,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.evolitist.nanopost.R
 import com.evolitist.nanopost.domain.model.Image
-import com.evolitist.nanopost.presentation.ui.view.CenterAlignedTopAppBar
 import com.evolitist.nanopost.presentation.ui.view.DropdownMenuIconButton
 import com.evolitist.nanopost.presentation.ui.view.Header
 import com.evolitist.nanopost.presentation.ui.view.HeaderStyle
+import com.evolitist.nanopost.presentation.ui.view.insets.CenterAlignedTopAppBar
 import java.text.SimpleDateFormat
 
 @Composable

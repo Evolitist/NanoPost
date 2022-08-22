@@ -18,7 +18,6 @@ import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -41,8 +40,9 @@ import androidx.compose.ui.unit.dp
 import androidx.work.WorkManager
 import com.evolitist.nanopost.R
 import com.evolitist.nanopost.presentation.ui.view.Avatar
-import com.evolitist.nanopost.presentation.ui.view.CenterAlignedTopAppBar
 import com.evolitist.nanopost.presentation.ui.view.HelperTextField
+import com.evolitist.nanopost.presentation.ui.view.insets.CenterAlignedTopAppBar
+import com.evolitist.nanopost.presentation.ui.view.insets.Scaffold
 import com.evolitist.nanopost.presentation.worker.CreateProfileWorker
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -201,7 +201,7 @@ fun ProfileDataPage(
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next,
                 ),
-                keyboardActions = KeyboardActions {  },
+                keyboardActions = KeyboardActions { },
                 modifier = Modifier.weight(1f),
             )
         }

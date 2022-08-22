@@ -1,21 +1,31 @@
-package com.evolitist.nanopost.presentation.ui.view
+package com.evolitist.nanopost.presentation.ui.view.insets
 
+import androidx.compose.animation.core.AnimationState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateTo
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.Surface
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.TopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
@@ -61,6 +71,7 @@ import kotlin.math.roundToInt
  * [IconButton]s. The default layout here is a [Row], so icons inside will be placed horizontally.
  * @param colors a [TopAppBarColors] that will be used to resolve the colors used for this top app
  * bar in different states. See [TopAppBarDefaults.smallTopAppBarColors].
+ * @param windowInsets a window insets that app bar will respect.
  * @param scrollBehavior a [TopAppBarScrollBehavior] which holds various offset values that will be
  * applied by this top app bar to set up its height and colors. A scroll behavior is designed to
  * work in conjunction with a scrolled content to change the top app bar appearance as the content
@@ -73,8 +84,8 @@ fun SmallTopAppBar(
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     colors: TopAppBarColors = TopAppBarDefaults.smallTopAppBarColors(),
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     scrollBehavior: TopAppBarScrollBehavior? = null,
-    contentPadding: PaddingValues = WindowInsets.statusBars.only(WindowInsetsSides.Top).asPaddingValues(),
 ) {
     SingleRowTopAppBar(
         modifier = modifier,
@@ -84,8 +95,8 @@ fun SmallTopAppBar(
         navigationIcon = navigationIcon,
         actions = actions,
         colors = colors,
+        windowInsets = windowInsets,
         scrollBehavior = scrollBehavior,
-        contentPadding = contentPadding,
     )
 }
 
@@ -110,6 +121,7 @@ fun SmallTopAppBar(
  * [IconButton]s. The default layout here is a [Row], so icons inside will be placed horizontally.
  * @param colors a [TopAppBarColors] that will be used to resolve the colors used for this top app
  * bar in different states. See [TopAppBarDefaults.centerAlignedTopAppBarColors].
+ * @param windowInsets a window insets that app bar will respect.
  * @param scrollBehavior a [TopAppBarScrollBehavior] which holds various offset values that will be
  * applied by this top app bar to set up its height and colors. A scroll behavior is designed to
  * work in conjunction with a scrolled content to change the top app bar appearance as the content
@@ -122,8 +134,8 @@ fun CenterAlignedTopAppBar(
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     colors: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors(),
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     scrollBehavior: TopAppBarScrollBehavior? = null,
-    contentPadding: PaddingValues = WindowInsets.statusBars.only(WindowInsetsSides.Top).asPaddingValues(),
 ) {
     SingleRowTopAppBar(
         modifier = modifier,
@@ -133,8 +145,8 @@ fun CenterAlignedTopAppBar(
         navigationIcon = navigationIcon,
         actions = actions,
         colors = colors,
+        windowInsets = windowInsets,
         scrollBehavior = scrollBehavior,
-        contentPadding = contentPadding,
     )
 }
 
@@ -162,6 +174,7 @@ fun CenterAlignedTopAppBar(
  * [IconButton]s. The default layout here is a [Row], so icons inside will be placed horizontally.
  * @param colors a [TopAppBarColors] that will be used to resolve the colors used for this top app
  * bar in different states. See [TopAppBarDefaults.mediumTopAppBarColors].
+ * @param windowInsets a window insets that app bar will respect.
  * @param scrollBehavior a [TopAppBarScrollBehavior] which holds various offset values that will be
  * applied by this top app bar to set up its height and colors. A scroll behavior is designed to
  * work in conjunction with a scrolled content to change the top app bar appearance as the content
@@ -174,8 +187,8 @@ fun MediumTopAppBar(
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     colors: TopAppBarColors = TopAppBarDefaults.mediumTopAppBarColors(),
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     scrollBehavior: TopAppBarScrollBehavior? = null,
-    contentPadding: PaddingValues = WindowInsets.statusBars.only(WindowInsetsSides.Top).asPaddingValues(),
 ) {
     TwoRowsTopAppBar(
         modifier = modifier,
@@ -187,10 +200,10 @@ fun MediumTopAppBar(
         navigationIcon = navigationIcon,
         actions = actions,
         colors = colors,
+        windowInsets = windowInsets,
         maxHeight = 112.dp,
         pinnedHeight = 64.dp,
         scrollBehavior = scrollBehavior,
-        contentPadding = contentPadding,
     )
 }
 
@@ -218,6 +231,7 @@ fun MediumTopAppBar(
  * [IconButton]s. The default layout here is a [Row], so icons inside will be placed horizontally.
  * @param colors a [TopAppBarColors] that will be used to resolve the colors used for this top app
  * bar in different states. See [TopAppBarDefaults.largeTopAppBarColors].
+ * @param windowInsets a window insets that app bar will respect.
  * @param scrollBehavior a [TopAppBarScrollBehavior] which holds various offset values that will be
  * applied by this top app bar to set up its height and colors. A scroll behavior is designed to
  * work in conjunction with a scrolled content to change the top app bar appearance as the content
@@ -230,8 +244,8 @@ fun LargeTopAppBar(
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     scrollBehavior: TopAppBarScrollBehavior? = null,
-    contentPadding: PaddingValues = WindowInsets.statusBars.only(WindowInsetsSides.Top).asPaddingValues(),
 ) {
     TwoRowsTopAppBar(
         title = title,
@@ -243,10 +257,10 @@ fun LargeTopAppBar(
         navigationIcon = navigationIcon,
         actions = actions,
         colors = colors,
+        windowInsets = windowInsets,
         maxHeight = 152.dp,
         pinnedHeight = 64.dp,
         scrollBehavior = scrollBehavior,
-        contentPadding = contentPadding,
     )
 }
 
@@ -267,14 +281,12 @@ private fun SingleRowTopAppBar(
     navigationIcon: @Composable () -> Unit,
     actions: @Composable RowScope.() -> Unit,
     colors: TopAppBarColors,
+    windowInsets: WindowInsets,
     scrollBehavior: TopAppBarScrollBehavior?,
-    contentPadding: PaddingValues,
 ) {
-    val totalPadding = contentPadding.calculateTopPadding() + contentPadding.calculateBottomPadding()
-
     // Sets the app bar's height offset to collapse the entire bar's height when content is
     // scrolled.
-    val heightOffsetLimit = with(LocalDensity.current) { -(64.dp + totalPadding).toPx() }
+    val heightOffsetLimit = with(LocalDensity.current) { -64.dp.toPx() }
     SideEffect {
         if (scrollBehavior?.state?.heightOffsetLimit != heightOffsetLimit) {
             scrollBehavior?.state?.heightOffsetLimit = heightOffsetLimit
@@ -298,14 +310,17 @@ private fun SingleRowTopAppBar(
     }
 
     // Set up support for resizing the top app bar when vertically dragging the bar itself.
-    val appBarDragModifier = Modifier.draggable(
-        orientation = Orientation.Vertical,
-        state = rememberDraggableState { delta ->
-            if (scrollBehavior != null && !scrollBehavior.isPinned) {
+    val appBarDragModifier = if (scrollBehavior != null && !scrollBehavior.isPinned) {
+        Modifier.draggable(
+            orientation = Orientation.Vertical,
+            state = rememberDraggableState { delta ->
                 scrollBehavior.state.heightOffset = scrollBehavior.state.heightOffset + delta
-            }
-        }
-    )
+            },
+            onDragStopped = { snapTopAppBar(scrollBehavior.state) }
+        )
+    } else {
+        Modifier
+    }
 
     // Compose a Surface with a TopAppBarLayout content. The surface's background color will be
     // animated as specified above, and the height of the app bar will be determined by the current
@@ -318,9 +333,11 @@ private fun SingleRowTopAppBar(
             64.dp.toPx() + (scrollBehavior?.state?.heightOffset ?: 0f)
         }
         TopAppBarLayout(
-            modifier = Modifier,
+            modifier = Modifier
+                .windowInsetsPadding(windowInsets)
+                // clip after padding so we don't know the title over the inset area
+                .clipToBounds(),
             heightPx = height,
-            contentPadding = contentPadding,
             navigationIconContentColor = colors.navigationIconContentColor(colorTransitionFraction).value,
             titleContentColor = colors.titleContentColor(colorTransitionFraction).value,
             actionIconContentColor = colors.actionIconContentColor(colorTransitionFraction).value,
@@ -355,10 +372,10 @@ private fun TwoRowsTopAppBar(
     navigationIcon: @Composable () -> Unit,
     actions: @Composable RowScope.() -> Unit,
     colors: TopAppBarColors,
+    windowInsets: WindowInsets,
     maxHeight: Dp,
     pinnedHeight: Dp,
     scrollBehavior: TopAppBarScrollBehavior?,
-    contentPadding: PaddingValues,
 ) {
     if (maxHeight <= pinnedHeight) {
         throw IllegalArgumentException(
@@ -366,14 +383,12 @@ private fun TwoRowsTopAppBar(
         )
     }
 
-    val totalPadding = contentPadding.calculateTopPadding() + contentPadding.calculateBottomPadding()
-
     val pinnedHeightPx: Float
     val maxHeightPx: Float
     val titleBottomPaddingPx: Int
     LocalDensity.current.run {
-        pinnedHeightPx = (pinnedHeight + totalPadding).toPx()
-        maxHeightPx = (maxHeight + totalPadding).toPx()
+        pinnedHeightPx = pinnedHeight.toPx()
+        maxHeightPx = maxHeight.toPx()
         titleBottomPaddingPx = titleBottomPadding.roundToPx()
     }
 
@@ -421,11 +436,15 @@ private fun TwoRowsTopAppBar(
         modifier = modifier.then(appBarDragModifier),
         color = appBarContainerColor,
     ) {
-        Column {
+        Column(
+            modifier = Modifier
+                .windowInsetsPadding(windowInsets)
+                // clip after padding so we don't know the title over the inset area
+                .clipToBounds(),
+        ) {
             TopAppBarLayout(
                 modifier = Modifier,
                 heightPx = pinnedHeightPx,
-                contentPadding = contentPadding,
                 navigationIconContentColor = colors.navigationIconContentColor(colorTransitionFraction).value,
                 titleContentColor = colors.titleContentColor(colorTransitionFraction).value,
                 actionIconContentColor = colors.actionIconContentColor(colorTransitionFraction).value,
@@ -442,7 +461,6 @@ private fun TwoRowsTopAppBar(
             TopAppBarLayout(
                 modifier = Modifier.clipToBounds(),
                 heightPx = maxHeightPx - pinnedHeightPx + (scrollBehavior?.state?.heightOffset ?: 0f),
-                contentPadding = PaddingValues(),
                 navigationIconContentColor = colors.navigationIconContentColor(colorTransitionFraction).value,
                 titleContentColor = colors.titleContentColor(colorTransitionFraction).value,
                 actionIconContentColor = colors.actionIconContentColor(colorTransitionFraction).value,
@@ -490,7 +508,6 @@ private fun TwoRowsTopAppBar(
 private fun TopAppBarLayout(
     modifier: Modifier,
     heightPx: Float,
-    contentPadding: PaddingValues,
     navigationIconContentColor: Color,
     titleContentColor: Color,
     actionIconContentColor: Color,
@@ -513,7 +530,7 @@ private fun TopAppBarLayout(
             ) {
                 CompositionLocalProvider(
                     LocalContentColor provides navigationIconContentColor,
-                    content = navigationIcon
+                    content = navigationIcon,
                 )
             }
             Box(
@@ -567,13 +584,12 @@ private fun TopAppBarLayout(
         }
 
         val layoutHeight = heightPx.roundToInt()
-        val topPadding = contentPadding.calculateTopPadding().roundToPx()
 
-        layout(constraints.maxWidth, layoutHeight + topPadding) {
+        layout(constraints.maxWidth, layoutHeight) {
             // Navigation icon
             navigationIconPlaceable.placeRelative(
                 x = 0,
-                y = (layoutHeight - navigationIconPlaceable.height) / 2 + topPadding,
+                y = (layoutHeight - navigationIconPlaceable.height) / 2,
             )
 
             // Title
@@ -587,13 +603,13 @@ private fun TopAppBarLayout(
                     else -> max(TopAppBarTitleInset.roundToPx(), navigationIconPlaceable.width)
                 },
                 y = when (titleVerticalArrangement) {
-                    Arrangement.Center -> (layoutHeight - titlePlaceable.height) / 2 + topPadding
+                    Arrangement.Center -> (layoutHeight - titlePlaceable.height) / 2
                     // Apply bottom padding from the title's baseline only when the Arrangement is
                     // "Bottom".
                     Arrangement.Bottom -> if (titleBottomPadding == 0) {
-                        layoutHeight + topPadding - titlePlaceable.height
+                        layoutHeight - titlePlaceable.height
                     } else {
-                        layoutHeight + topPadding - titlePlaceable.height - max(
+                        layoutHeight - titlePlaceable.height - max(
                             0,
                             titleBottomPadding - titlePlaceable.height + titleBaseline,
                         )
@@ -606,9 +622,29 @@ private fun TopAppBarLayout(
             // Action icons
             actionIconsPlaceable.placeRelative(
                 x = constraints.maxWidth - actionIconsPlaceable.width,
-                y = (layoutHeight - actionIconsPlaceable.height) / 2 + topPadding,
+                y = (layoutHeight - actionIconsPlaceable.height) / 2,
             )
         }
+    }
+}
+
+/**
+ * Default insets to be used and consumed by the top app bars
+ */
+val TopAppBarDefaults.windowInsets: WindowInsets
+    @Composable get() {
+        return WindowInsets.safeDrawing
+            .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
+    }
+
+private suspend fun snapTopAppBar(state: TopAppBarState) {
+    // In case the app bar motion was stopped in a state where it's partially visible, snap it to
+    // the nearest state.
+    if (state.heightOffset < 0 && state.heightOffset > state.heightOffsetLimit) {
+        AnimationState(initialValue = state.heightOffset).animateTo(
+            if (state.collapsedFraction < 0.5f) 0f else state.heightOffsetLimit,
+            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+        ) { state.heightOffset = value }
     }
 }
 
