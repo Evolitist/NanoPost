@@ -23,12 +23,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
@@ -68,7 +69,7 @@ fun FeedScreen(
     }
     Scaffold(
         topBar = {
-            val activityViewModel = viewModel<MainViewModel>()
+            val activityViewModel = hiltViewModel<MainViewModel>(LocalContext.current as ViewModelStoreOwner)
             val profile by activityViewModel.profileFlow.collectAsState()
 
             FloatingAppBar(
