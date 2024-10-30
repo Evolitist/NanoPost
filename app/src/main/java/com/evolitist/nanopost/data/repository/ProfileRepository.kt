@@ -15,7 +15,7 @@ interface ProfileRepository {
         displayName: String?,
         bio: String?,
         avatar: ImageInfo?,
-        progressCallback: (Float) -> Unit,
+        progressCallback: (Float?) -> Unit,
     ): Profile
 
     fun getSubscribers(profileId: String): Flow<PagingData<ProfileCompact>>

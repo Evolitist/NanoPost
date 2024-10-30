@@ -26,15 +26,9 @@ fun Bitmap.bound(targetSize: Int): Bitmap {
     val inWidth = this.width
     val inHeight = this.height
     val (outWidth, outHeight) = when {
-        inWidth <= targetSize && inHeight <= targetSize -> {
-            inWidth to inHeight
-        }
-        inWidth > inHeight -> {
-            targetSize to (inHeight * targetSize.toFloat() / inWidth).roundToInt()
-        }
-        else -> {
-            (inWidth * targetSize.toFloat() / inHeight).roundToInt() to targetSize
-        }
+        inWidth <= targetSize && inHeight <= targetSize -> inWidth to inHeight
+        inWidth > inHeight -> targetSize to (inHeight * targetSize.toFloat() / inWidth).roundToInt()
+        else -> (inWidth * targetSize.toFloat() / inHeight).roundToInt() to targetSize
     }
     return scale(outWidth, outHeight).also {
         if (!this.sameAs(it)) {

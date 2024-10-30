@@ -6,7 +6,6 @@ import com.evolitist.nanopost.data.network.model.ApiImage
 import com.evolitist.nanopost.data.network.model.ApiPost
 import com.evolitist.nanopost.data.network.model.ApiProfile
 import com.evolitist.nanopost.data.network.model.ApiProfileCompact
-import com.evolitist.nanopost.data.network.model.Empty
 import com.evolitist.nanopost.data.network.model.response.PagedDataResponse
 import com.evolitist.nanopost.di.ApiClient
 import com.evolitist.nanopost.domain.model.ImageInfo
@@ -15,9 +14,6 @@ import io.ktor.client.plugins.onUpload
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.setBody
-import io.ktor.http.Headers
-import io.ktor.http.HttpHeaders
-import io.ktor.http.escapeIfNeeded
 import javax.inject.Inject
 
 class NanoPostApiService @Inject constructor(
@@ -37,33 +33,26 @@ class NanoPostApiService @Inject constructor(
         displayName: String?,
         bio: String?,
         avatar: ImageInfo?,
-        onUpload: (Float) -> Unit,
+        onUpload: (Float?) -> Unit,
     ): ApiProfile = put("profile") {
-        MultiPartFormDataContent(
-            formData {
-                append("username", username)
-                displayName?.let { append("displayName", it) }
-                bio?.let { append("bio", it) }
-                avatar?.let {
-                    append(
-                        key = "avatar",
-                        value = it.bytes,
-                        headers = Headers.build {
-                            append(
-                                HttpHeaders.ContentDisposition,
-                                "filename=${it.fileName.escapeIfNeeded()}"
-                            )
-                            it.mimeType?.let { mimeType ->
-                                append(HttpHeaders.ContentType, mimeType)
-                            }
-                        },
-                    )
+        setBody(
+            MultiPartFormDataContent(
+                formData {
+                    append("username", username)
+                    displayName?.let { append("displayName", it) }
+                    bio?.let { append("bio", it) }
+                    avatar?.let {
+                        append(
+                            key = "avatar",
+                            image = it,
+                        )
+                    }
                 }
-            }
+            )
         )
 
         onUpload { bytesSentTotal, contentLength ->
-            onUpload(bytesSentTotal.toFloat() / contentLength.toFloat())
+            onUpload(contentLength?.let { bytesSentTotal.toFloat() / it.toFloat() })
         }
     }
 
@@ -103,78 +92,63 @@ class NanoPostApiService @Inject constructor(
         query("offset", offset)
     }
 
-    suspend fun subscribe(id: String) = put<Empty>("profile/$id/subscribe") {
+    suspend fun subscribe(id: String) = put<Unit>("profile/$id/subscribe") {
     }
 
-    suspend fun unsubscribe(id: String) = delete<Empty>("profile/$id/subscribe") {
+    suspend fun unsubscribe(id: String) = delete<Unit>("profile/$id/subscribe") {
     }
 
     suspend fun putImage(
         imageInfo: ImageInfo,
-        onUpload: (Float) -> Unit,
+        onUpload: (Float?) -> Unit,
     ): ApiImage = put("image") {
         setBody(
             MultiPartFormDataContent(
                 formData {
                     append(
                         key = "image",
-                        value = imageInfo.bytes,
-                        headers = Headers.build {
-                            append(
-                                HttpHeaders.ContentDisposition,
-                                "filename=${imageInfo.fileName.escapeIfNeeded()}"
-                            )
-                            imageInfo.mimeType?.let {
-                                append(HttpHeaders.ContentType, it)
-                            }
-                        },
+                        image = imageInfo,
                     )
                 }
             )
         )
 
         onUpload { bytesSentTotal, contentLength ->
-            onUpload(bytesSentTotal.toFloat() / contentLength.toFloat())
+            onUpload(contentLength?.let { bytesSentTotal.toFloat() / it.toFloat() })
         }
     }
 
     suspend fun getImage(imageId: String): ApiImage = get("image/$imageId")
 
-    suspend fun deleteImage(imageId: String) = delete<Empty>("image/$imageId")
+    suspend fun deleteImage(imageId: String) = delete<Unit>("image/$imageId")
 
     suspend fun putPost(
         text: String?,
         images: List<ImageInfo>,
-        onUpload: (Float) -> Unit,
+        onUpload: (Float?) -> Unit,
     ): ApiPost = put("post") {
         setBody(
             MultiPartFormDataContent(
                 formData {
                     text?.let { append("text", it) }
-                    images.forEachIndexed { index, imageInfo ->
-                        append(
-                            key = "image${index.inc()}",
-                            value = imageInfo.bytes,
-                            headers = Headers.build {
-                                append(HttpHeaders.ContentDisposition, "filename=${imageInfo.fileName.escapeIfNeeded()}")
-                                imageInfo.mimeType?.let { append(HttpHeaders.ContentType, it) }
-                            },
-                        )
-                    }
+                    append(
+                        images = images,
+                        keyProducer = { "image${it.inc()}" },
+                    )
                 }
             )
         )
 
         onUpload { bytesSentTotal, contentLength ->
-            onUpload(bytesSentTotal.toFloat() / contentLength.toFloat())
+            onUpload(contentLength?.let { bytesSentTotal.toFloat() / it.toFloat() })
         }
     }
 
     suspend fun getPost(postId: String) = get<ApiPost>("post/$postId")
 
-    suspend fun deletePost(postId: String) = delete<Empty>("post/$postId")
+    suspend fun deletePost(postId: String) = delete<Unit>("post/$postId")
 
-    suspend fun likePost(postId: String) = put<Empty>("post/$postId/like")
+    suspend fun likePost(postId: String) = put<ApiPost>("post/$postId/like")
 
-    suspend fun unlikePost(postId: String) = delete<Empty>("post/$postId/like")
+    suspend fun unlikePost(postId: String) = delete<ApiPost>("post/$postId/like")
 }

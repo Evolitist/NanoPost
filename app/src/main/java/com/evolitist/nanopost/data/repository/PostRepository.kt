@@ -2,6 +2,7 @@ package com.evolitist.nanopost.data.repository
 
 import androidx.paging.PagingData
 import com.evolitist.nanopost.domain.model.ImageInfo
+import com.evolitist.nanopost.domain.model.Likes
 import com.evolitist.nanopost.domain.model.Post
 import kotlinx.coroutines.flow.Flow
 
@@ -14,12 +15,14 @@ interface PostRepository {
     suspend fun putPost(
         text: String?,
         images: List<ImageInfo>,
-        progressCallback: (Float) -> Unit,
+        progressCallback: (Float?) -> Unit,
     ): Post
 
     suspend fun getPost(postId: String): Post
 
     suspend fun deletePost(postId: String)
+
+    fun getPostLikes(postId: String): Flow<Likes>
 
     suspend fun likePost(postId: String)
 

@@ -2,74 +2,91 @@ package com.evolitist.nanopost.presentation.ui.create.profile
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AddPhotoAlternate
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.work.WorkManager
 import com.evolitist.nanopost.R
+import com.evolitist.nanopost.presentation.navigation.sharedBounds
+import com.evolitist.nanopost.presentation.ui.create.CreateActions
 import com.evolitist.nanopost.presentation.ui.view.Avatar
-import com.evolitist.nanopost.presentation.ui.view.HelperTextField
-import com.evolitist.nanopost.presentation.ui.view.insets.CenterAlignedTopAppBar
-import com.evolitist.nanopost.presentation.ui.view.insets.Scaffold
 import com.evolitist.nanopost.presentation.worker.CreateProfileWorker
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
-import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalPagerApi::class)
+private const val BioMaxLength = 140
+
+@Serializable
+data object CreateProfileRoute
+
 @Composable
 fun CreateProfileScreen(
     onCloseClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: CreateProfileViewModel = hiltViewModel(),
 ) {
     val (username, setUsername) = rememberSaveable { mutableStateOf("") }
     val (displayName, setDisplayName) = rememberSaveable { mutableStateOf("") }
     val (bio, setBio) = rememberSaveable { mutableStateOf("") }
-    var avatarUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+    val (avatarUri, setAvatarUri) = rememberSaveable { mutableStateOf<Uri?>(null) }
+
+    val focusManager = LocalFocusManager.current
+    val (usernameFocus, displayNameFocus, bioFocus) = remember { FocusRequester.createRefs() }
 
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        uri?.let { avatarUri = it }
+        uri?.let(setAvatarUri)
     }
 
-    val topAppBarState = rememberTopAppBarState()
-    val scrollBehavior = remember(topAppBarState) {
-        TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
+    fun launchCreateProfile() {
+        keyboardController?.hide()
+        WorkManager.getInstance(context)
+            .enqueue(CreateProfileWorker.newRequest(username, displayName, bio, avatarUri))
+        onCloseClick()
     }
+
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
+        modifier = modifier
+            .fillMaxSize()
+            .sharedBounds(CreateActions.Profile),
         topBar = {
             CenterAlignedTopAppBar(
                 navigationIcon = {
@@ -82,137 +99,92 @@ fun CreateProfileScreen(
                 actions = {
                     IconButton(
                         content = { Icon(Icons.Rounded.Check, contentDescription = null) },
-                        onClick = {
-                            keyboardController?.hide()
-                            WorkManager.getInstance(context)
-                                .enqueue(CreateProfileWorker.newRequest(username, displayName, bio, avatarUri))
-                            onCloseClick()
-                        },
+                        onClick = ::launchCreateProfile,
                     )
                 },
                 scrollBehavior = scrollBehavior,
             )
         },
     ) { padding ->
-        val scope = rememberCoroutineScope()
-        val state = rememberPagerState()
-
         Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
+                .fillMaxSize()
                 .padding(padding)
-                .fillMaxSize(),
+                .padding(16.dp),
         ) {
-            HorizontalPager(
-                count = 2,
-                state = state,
-                userScrollEnabled = false,
-                modifier = Modifier.weight(1f),
-            ) { page ->
-                when (page) {
-                    0 -> UsernamePage(
-                        username = username,
-                        onUsernameChange = setUsername,
-                        onNextClick = {
-                            scope.launch { state.animateScrollToPage(1) }
-                        },
-                    )
-                    1 -> ProfileDataPage(
-                        avatarUri = avatarUri?.toString(),
-                        displayName = displayName,
-                        onDisplayNameChange = setDisplayName,
-                        bio = bio,
-                        onBioChange = setBio,
-                        onNextClick = {
-
-                        },
-                    )
-                }
-            }
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
-            ) {
-                TextButton(
-                    onClick = { /*TODO*/ },
-                    content = { Text("Cancel") },
-                )
-
-                Button(
-                    onClick = {
-                        scope.launch { state.animateScrollToPage(1) }
-                    },
-                    content = { Text("Next") },
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun UsernamePage(
-    username: String,
-    onUsernameChange: (String) -> Unit,
-    onNextClick: () -> Unit,
-) {
-    Column(
-        modifier = Modifier.padding(16.dp),
-    ) {
-        HelperTextField(
-            value = username,
-            onValueChange = onUsernameChange,
-            singleLine = true,
-            label = { Text("Username") },
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Next,
-            ),
-            keyboardActions = KeyboardActions { onNextClick() },
-            modifier = Modifier.fillMaxWidth(),
-        )
-    }
-}
-
-@Composable
-fun ProfileDataPage(
-    avatarUri: String?,
-    displayName: String,
-    onDisplayNameChange: (String) -> Unit,
-    bio: String,
-    onBioChange: (String) -> Unit,
-    onNextClick: () -> Unit,
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.padding(16.dp),
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            Avatar(
-                model = avatarUri,
-                monogram = { Icon(Icons.Rounded.AddPhotoAlternate, null) },
-            )
-
-            TextField(
-                value = displayName,
-                onValueChange = onDisplayNameChange,
+            OutlinedTextField(
+                value = username,
+                onValueChange = setUsername,
                 singleLine = true,
+                label = { Text("Username") },
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next,
                 ),
-                keyboardActions = KeyboardActions { },
-                modifier = Modifier.weight(1f),
+                keyboardActions = KeyboardActions {
+                    focusManager.moveFocus(FocusDirection.Next)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(usernameFocus)
+                    .focusProperties {
+                        next = displayNameFocus
+                    },
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                Avatar(
+                    model = avatarUri?.toString(),
+                    blurHash = null,
+                    content = { Icon(Icons.Rounded.AddPhotoAlternate, contentDescription = null) },
+                    modifier = Modifier
+                        .size(96.dp)
+                        .clickable {
+                            imagePicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        },
+                )
+                OutlinedTextField(
+                    value = displayName,
+                    onValueChange = setDisplayName,
+                    singleLine = true,
+                    label = { Text("Display name") },
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                    ),
+                    keyboardActions = KeyboardActions {
+                        focusManager.moveFocus(FocusDirection.Next)
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .focusRequester(displayNameFocus)
+                        .focusProperties {
+                            next = bioFocus
+                            previous = usernameFocus
+                        },
+                )
+            }
+            OutlinedTextField(
+                value = bio,
+                onValueChange = setBio,
+                label = { Text("Bio") },
+                supportingText = { Text("${bio.length}/$BioMaxLength") },
+                isError = bio.length >= BioMaxLength,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done,
+                ),
+                keyboardActions = KeyboardActions {
+                    focusManager.clearFocus(force = true)
+                    launchCreateProfile()
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(bioFocus)
+                    .focusProperties {
+                        previous = displayNameFocus
+                    },
             )
         }
-
-        TextField(
-            value = bio,
-            onValueChange = onBioChange,
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions { onNextClick() },
-        )
     }
 }

@@ -31,9 +31,7 @@ fun PaddingValues.copy(
 operator fun PaddingValues.plus(
     other: PaddingValues,
 ): PaddingValues {
-
     val ld = LocalLayoutDirection.current
-
     return PaddingValues(
         start = calculateStartPadding(ld) + other.calculateStartPadding(ld),
         top = calculateTopPadding() + other.calculateTopPadding(),

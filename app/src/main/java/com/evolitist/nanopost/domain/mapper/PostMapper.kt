@@ -10,6 +10,7 @@ class PostMapper @Inject constructor(
     private val imageMapper: ImageMapper,
     private val likesMapper: LikesMapper,
 ) {
+
     fun fromApiToModel(api: ApiPost) = Post(
         id = api.id,
         owner = api.owner.let(profileCompactMapper::fromApiToModel),

@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">NanoPost</string>
+    <string name="app_name" translatable="false">NanoPost</string>
 
     <string name="auth">Auth</string>
     <string name="logout">Logout</string>
@@ -18,19 +19,46 @@
     <string name="username_validation_too_short">Username must be longer than 3 characters</string>
     <string name="username_validation_too_long">Username must be shorter than 16 characters</string>
     <string name="username_validation_malformed">Username can only contain lowercase letters, dots and underscores</string>
+    <string name="password_validation_too_short">Password must be longer than 8 characters</string>
+    <string name="password_validation_not_equal">Passwords do not match</string>
 
+    <string name="action_back">Back</string>
+    <string name="action_close">Close</string>
+    <string name="action_done">Done</string>
+    <string name="action_menu">Menu</string>
     <string name="action_retry">Retry</string>
     <string name="action_delete">Delete</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_cancel">Cancel</string>
 
     <string name="auth_hint_username">Username</string>
     <string name="auth_hint_password">Password</string>
+    <string name="auth_hint_confirm_password">Confirm password</string>
 
     <string name="auth_action_continue">Continue</string>
     <string name="auth_action_sign_in">Sign In</string>
     <string name="auth_action_register">Register</string>
     <string name="auth_action_loading">Loading…</string>
 
-    <string name="auth_error_username_too_short">Username must be longer than 3 characters</string>
-    <string name="auth_error_username_too_long">Username must not be longer than 16 characters</string>
-    <string name="auth_error_username_invalid_characters">Username can only contain lowercase letters, dots and underscores</string>
+    <string name="logout_message">Are you sure you want to log out?</string>
+
+    <string name="profile_bio_empty" translatable="false">…</string>
+    <plurals name="profile_label_subscribers">
+        <item quantity="one">subscriber</item>
+        <item quantity="other">subscribers</item>
+    </plurals>
+    <plurals name="profile_label_images">
+        <item quantity="one">image</item>
+        <item quantity="other">images</item>
+    </plurals>
+    <plurals name="profile_label_posts">
+        <item quantity="one">post</item>
+        <item quantity="other">posts</item>
+    </plurals>
+    <string name="profile_action_edit">Edit</string>
+    <string name="profile_action_subscribe">Subscribe</string>
+    <string name="profile_action_unsubscribe">Unsubscribe</string>
+
+    <string name="create_post_placeholder">What\'s on your mind?</string>
+    <string name="create_post_add_image">Add image…</string>
 </resources>

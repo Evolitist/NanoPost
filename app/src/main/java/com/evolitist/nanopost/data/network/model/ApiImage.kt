@@ -7,5 +7,7 @@ data class ApiImage(
     val id: String,
     val owner: ApiProfileCompact,
     val dateCreated: Long,
+    val contentDescription: String?,
+    val blurHash: String?,
     val sizes: List<ApiImageSize>,
 )

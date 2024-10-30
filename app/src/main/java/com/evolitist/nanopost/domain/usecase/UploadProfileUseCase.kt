@@ -14,7 +14,7 @@ class UploadProfileUseCase @Inject constructor(
         displayName: String?,
         bio: String?,
         avatar: ImageInfo?,
-        progressCallback: (Float) -> Unit = {},
+        progressCallback: (Float?) -> Unit = {},
     ): Profile {
         return profileRepository.putProfile(
             username = username,

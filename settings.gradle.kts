@@ -15,5 +15,6 @@ dependencyResolutionManagement {
     }
 }
 
-include(":app")
 rootProject.name = "NanoPost"
+include(":app")
+include(":baselineprofile")

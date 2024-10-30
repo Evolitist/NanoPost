@@ -10,6 +10,7 @@ class ProfileCompactMapper @Inject constructor() {
         username = api.username,
         displayName = api.displayName,
         avatarUrl = api.avatarUrl,
+        avatarBlurHash = api.avatarBlurHash,
         subscribed = api.subscribed,
     )
 }

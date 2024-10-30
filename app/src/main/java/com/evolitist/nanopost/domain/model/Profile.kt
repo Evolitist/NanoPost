@@ -12,6 +12,7 @@ data class Profile(
     val avatarId: String?,
     val avatarLarge: String?,
     val avatarSmall: String?,
+    val avatarBlurHash: String?,
     val subscribed: Boolean,
     val subscribersCount: Int,
     val postsCount: Int,
@@ -24,6 +25,7 @@ data class Profile(
         username = username,
         displayName = displayName,
         avatarUrl = avatarSmall,
+        avatarBlurHash = avatarBlurHash,
         subscribed = subscribed,
     )
 }

@@ -8,7 +8,7 @@ class UsernameValidator @Inject constructor() {
     companion object {
         private const val UsernameMinLength = 3
         private const val UsernameMaxLength = 16
-        private val UsernameRegex = Regex("""[a-z_.]+""")
+        private val UsernameRegex = "[a-z_.]+".toRegex()
     }
 
     fun validate(value: String): UsernameCheckResult? {

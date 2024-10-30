@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="ImpliedQuantity">
+    <string name="auth">Авторизация</string>
+    <string name="logout">Выйти</string>
+    <string name="feed">Лента</string>
+    <string name="search">Поиск</string>
+    <string name="profile">Профиль</string>
+    <string name="subscribers">Подписчики</string>
+    <string name="images">Картинки</string>
+    <string name="posts">Посты</string>
+    <string name="create">Создать…</string>
+    <string name="create_post">Новый пост</string>
+    <string name="create_profile">Новый профиль</string>
+    <string name="post">Пост</string>
+    <string name="image">Картинка</string>
+
+    <string name="username_validation_too_short">Никнейм должен быть длиннее 3 символов</string>
+    <string name="username_validation_too_long">Никнейм должен быть короче 16 символов</string>
+    <string name="username_validation_malformed">Никнейм может содержать только строчные буквы, точки и подчёркивания</string>
+    <string name="password_validation_too_short">Пароль должен быть длиннее 8 символов</string>
+    <string name="password_validation_not_equal">Пароли не совпадают</string>
+
+    <string name="action_back">Назад</string>
+    <string name="action_close">Закрыть</string>
+    <string name="action_done">Готово</string>
+    <string name="action_menu">Меню</string>
+    <string name="action_retry">Повторить</string>
+    <string name="action_delete">Удалить</string>
+    <string name="action_confirm">Подтвердить</string>
+    <string name="action_cancel">Отмена</string>
+
+    <string name="auth_hint_username">Имя пользователя</string>
+    <string name="auth_hint_password">Пароль</string>
+    <string name="auth_hint_confirm_password">Подтвердите пароль</string>
+
+    <string name="auth_action_continue">Продолжить</string>
+    <string name="auth_action_sign_in">Войти</string>
+    <string name="auth_action_register">Зарегистрироваться</string>
+    <string name="auth_action_loading">Загрузка…</string>
+
+    <string name="logout_message">Вы уверены, что хотите выйти из аккаунта?</string>
+
+    <plurals name="profile_label_subscribers">
+        <item quantity="one">подписчик</item>
+        <item quantity="few">подписчика</item>
+        <item quantity="many">подписчиков</item>
+        <item quantity="other">подписчиков</item>
+    </plurals>
+    <plurals name="profile_label_images">
+        <item quantity="one">картинка</item>
+        <item quantity="few">картинки</item>
+        <item quantity="many">картинок</item>
+        <item quantity="other">картинок</item>
+    </plurals>
+    <plurals name="profile_label_posts">
+        <item quantity="one">пост</item>
+        <item quantity="few">поста</item>
+        <item quantity="many">постов</item>
+        <item quantity="other">постов</item>
+    </plurals>
+    <string name="profile_action_edit">Редактировать</string>
+    <string name="profile_action_subscribe">Подписаться</string>
+    <string name="profile_action_unsubscribe">Отписаться</string>
+
+    <string name="create_post_placeholder">О чём хочешь рассказать?</string>
+    <string name="create_post_add_image">Добавить картинку…</string>
+</resources>

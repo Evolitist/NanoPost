@@ -7,9 +7,11 @@ import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
+import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.ForegroundInfo
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
@@ -19,6 +21,8 @@ import com.evolitist.nanopost.domain.usecase.PrepareImageUseCase
 import com.evolitist.nanopost.domain.usecase.UploadPostUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 
 @HiltWorker
 class CreatePostWorker @AssistedInject constructor(
@@ -35,6 +39,7 @@ class CreatePostWorker @AssistedInject constructor(
         private const val KEY_IMAGES = "com.evolitist.nanopost.extras.IMAGES"
 
         fun newRequest(text: String?, images: List<Uri>) = OneTimeWorkRequestBuilder<CreatePostWorker>()
+            .setConstraints(Constraints(requiredNetworkType = NetworkType.CONNECTED))
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .setInputData(
                 Data.Builder()
@@ -53,8 +58,10 @@ class CreatePostWorker @AssistedInject constructor(
             return Result.failure()
         }
 
-        runCatching {
+        try {
             setForeground(getForegroundInfo())
+        } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
         }
 
         val images = imageUris.map { prepareImageUseCase(it) }

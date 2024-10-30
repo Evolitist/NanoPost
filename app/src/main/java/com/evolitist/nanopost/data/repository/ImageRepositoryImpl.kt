@@ -8,7 +8,7 @@ import com.evolitist.nanopost.data.paging.StringKeyedPagingSource
 import com.evolitist.nanopost.domain.mapper.ImageMapper
 import com.evolitist.nanopost.domain.model.Image
 import com.evolitist.nanopost.domain.model.ImageInfo
-import com.evolitist.nanopost.presentation.extensions.mapData
+import com.evolitist.nanopost.presentation.extensions.mapValues
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -19,7 +19,7 @@ class ImageRepositoryImpl @Inject constructor(
 
     override suspend fun putImage(
         imageInfo: ImageInfo,
-        progressCallback: (Float) -> Unit,
+        progressCallback: (Float?) -> Unit,
     ): Image {
         return apiService.putImage(
             imageInfo,
@@ -40,6 +40,6 @@ class ImageRepositoryImpl @Inject constructor(
             StringKeyedPagingSource { count, nextFrom ->
                 apiService.getImages(profileId, count, nextFrom)
             }
-        }.flow.mapData(imageMapper::fromApiToModel)
+        }.flow.mapValues(imageMapper::fromApiToModel)
     }
 }

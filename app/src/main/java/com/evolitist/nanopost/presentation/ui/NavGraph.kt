@@ -1,57 +1,58 @@
 package com.evolitist.nanopost.presentation.ui
 
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
-import androidx.navigation.compose.dialog
-import androidx.navigation.navArgument
-import com.evolitist.nanopost.presentation.ui.NanoPostDestinationArgs.IdArg
-import com.evolitist.nanopost.presentation.ui.auth.AuthScreen
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
+import com.evolitist.nanopost.presentation.navigation.composable
+import com.evolitist.nanopost.presentation.ui.auth.AuthRoute
+import com.evolitist.nanopost.presentation.ui.create.post.CreatePostRoute
 import com.evolitist.nanopost.presentation.ui.create.post.CreatePostScreen
+import com.evolitist.nanopost.presentation.ui.create.profile.CreateProfileRoute
 import com.evolitist.nanopost.presentation.ui.create.profile.CreateProfileScreen
-import com.evolitist.nanopost.presentation.ui.feed.FeedScreen
-import com.evolitist.nanopost.presentation.ui.image.ImageScreen
-import com.evolitist.nanopost.presentation.ui.images.ImagesScreen
-import com.evolitist.nanopost.presentation.ui.post.PostScreen
-import com.evolitist.nanopost.presentation.ui.posts.PostsScreen
-import com.evolitist.nanopost.presentation.ui.profile.ProfileScreen
-import com.evolitist.nanopost.presentation.ui.subscribers.SubscribersScreen
-import com.evolitist.nanopost.presentation.ui.view.AlertDialogContent
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.composable
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
+import com.evolitist.nanopost.presentation.ui.feed.FeedRoute
+import com.evolitist.nanopost.presentation.ui.image.ImageRoute
+import com.evolitist.nanopost.presentation.ui.images.ImagesRoute
+import com.evolitist.nanopost.presentation.ui.post.PostRoute
+import com.evolitist.nanopost.presentation.ui.posts.PostsRoute
+import com.evolitist.nanopost.presentation.ui.profile.ProfileRoute
+import com.evolitist.nanopost.presentation.ui.subscribers.SubscribersRoute
+import kotlinx.serialization.Serializable
 import soup.compose.material.motion.animation.materialSharedAxisXIn
 import soup.compose.material.motion.animation.materialSharedAxisXOut
 import soup.compose.material.motion.animation.rememberSlideDistance
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
+@Serializable
+data object RootRoute
+
 @Composable
 fun AppNavGraph() {
-    val activityViewModel = viewModel<MainViewModel>()
-    val bottomSheetNavigator = rememberBottomSheetNavigator()
-    val navController = rememberAnimatedNavController(bottomSheetNavigator)
+    val activityViewModel = hiltViewModel<MainViewModel>(LocalContext.current as ViewModelStoreOwner)
+    val navController = rememberNavController()
     val navigationActions = remember(navController) {
         NanoPostNavigationActions(navController)
     }
 
-    val showAuth by activityViewModel.showAuthFlow.collectAsState()
+    val showAuth by activityViewModel.showAuthFlow.collectAsStateWithLifecycle()
 
     LaunchedEffect(showAuth) {
         when (showAuth) {
@@ -61,18 +62,30 @@ fun AppNavGraph() {
         }
     }
 
-    Scaffold { innerPadding ->
-        val slideDistance = rememberSlideDistance()
-        AnimatedNavHost(
+    val slideDistance = rememberSlideDistance()
+    SharedTransitionLayout {
+        NavHost(
             navController = navController,
-            startDestination = NanoPostDestinations.RootRoute,
+            startDestination = RootRoute,
             enterTransition = { materialSharedAxisXIn(true, slideDistance) },
-            exitTransition = { materialSharedAxisXOut(true, slideDistance) },
-            popEnterTransition = { materialSharedAxisXIn(false, slideDistance) },
+            exitTransition = {
+                if (targetState.matches<CreatePostRoute>() || targetState.matches<CreateProfileRoute>()) {
+                    ExitTransition.KeepUntilTransitionsFinished
+                } else {
+                    materialSharedAxisXOut(true, slideDistance)
+                }
+            },
+            popEnterTransition = {
+                if (initialState.matches<CreatePostRoute>() || initialState.matches<CreateProfileRoute>()) {
+                    fadeIn(animationSpec = tween(700))
+                } else {
+                    materialSharedAxisXIn(false, slideDistance)
+                }
+            },
             popExitTransition = { materialSharedAxisXOut(false, slideDistance) },
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier.fillMaxSize(),
         ) {
-            composable(NanoPostDestinations.RootRoute) {
+            composable<RootRoute> {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     Box(
                         contentAlignment = Alignment.Center,
@@ -82,37 +95,25 @@ fun AppNavGraph() {
                 }
             }
 
-            composable(NanoPostDestinations.AuthRoute) {
-                AuthScreen()
+            composable<AuthRoute> {
+                AuthRoute()
             }
 
-            dialog(NanoPostDestinations.LogoutRoute) {
-                AlertDialogContent(
-                    title = { Text("Logout") },
-                    text = { Text("Are you sure you want to logout?") },
-                    confirmButton = {
-                        TextButton(
-                            onClick = activityViewModel::logout,
-                            content = { Text("Confirm") },
-                        )
-                    },
-                    dismissButton = {
-                        TextButton(
-                            onClick = navController::navigateUp,
-                            content = { Text("Cancel") },
-                        )
-                    },
-                )
-            }
-
-            authorizedRoutes(navigationActions)
+            authorizedRoutes(
+                navigationActions = navigationActions,
+                onLogout = activityViewModel::logout,
+            )
         }
     }
 }
 
-fun NavGraphBuilder.authorizedRoutes(navigationActions: NanoPostNavigationActions) {
-    composable(NanoPostDestinations.FeedRoute) {
-        FeedScreen(
+context(SharedTransitionScope)
+fun NavGraphBuilder.authorizedRoutes(
+    navigationActions: NanoPostNavigationActions,
+    onLogout: () -> Unit,
+) {
+    composable<FeedRoute> {
+        FeedRoute(
             onCreatePostClick = navigationActions::navigateToCreatePost,
             onCreateProfileClick = navigationActions::navigateToCreateProfile,
             onPostClick = navigationActions::navigateToPost,
@@ -121,19 +122,11 @@ fun NavGraphBuilder.authorizedRoutes(navigationActions: NanoPostNavigationAction
         )
     }
 
-    composable(
-        route = NanoPostDestinations.ProfileRoute,
-        arguments = listOf(
-            navArgument(IdArg) {
-                type = NavType.StringType
-                nullable = true
-            }
-        ),
-    ) { backStackEntry ->
-        ProfileScreen(
-            profileId = backStackEntry.arguments?.getString(IdArg),
+    composable<ProfileRoute> {
+        ProfileRoute(
+            profileId = it.id,
             onCloseClick = navigationActions::navigateUp,
-            onLogoutClick = navigationActions::openLogoutDialog,
+            onLogoutClick = onLogout,
             onSubscribersClick = navigationActions::navigateToSubscribers,
             onImagesClick = navigationActions::navigateToImages,
             onPostsClick = navigationActions::navigateToPosts,
@@ -145,49 +138,22 @@ fun NavGraphBuilder.authorizedRoutes(navigationActions: NanoPostNavigationAction
         )
     }
 
-    composable(
-        route = NanoPostDestinations.SubscribersRoute,
-        arguments = listOf(
-            navArgument(IdArg) {
-                type = NavType.StringType
-                nullable = true
-            }
-        ),
-    ) { backStackEntry ->
-        SubscribersScreen(
-            profileId = backStackEntry.arguments?.getString(IdArg),
+    composable<SubscribersRoute> {
+        SubscribersRoute(
             onCloseClick = navigationActions::navigateUp,
             onProfileClick = navigationActions::navigateToProfile,
         )
     }
 
-    composable(
-        route = NanoPostDestinations.ImagesRoute,
-        arguments = listOf(
-            navArgument(IdArg) {
-                type = NavType.StringType
-                nullable = true
-            }
-        ),
-    ) { backStackEntry ->
-        ImagesScreen(
-            profileId = backStackEntry.arguments?.getString(IdArg),
+    composable<ImagesRoute> {
+        ImagesRoute(
             onCloseClick = navigationActions::navigateUp,
             onImageClick = navigationActions::navigateToImage,
         )
     }
 
-    composable(
-        route = NanoPostDestinations.PostsRoute,
-        arguments = listOf(
-            navArgument(IdArg) {
-                type = NavType.StringType
-                nullable = true
-            }
-        ),
-    ) { backStackEntry ->
-        PostsScreen(
-            profileId = backStackEntry.arguments?.getString(IdArg),
+    composable<PostsRoute> {
+        PostsRoute(
             onCloseClick = navigationActions::navigateUp,
             onPostClick = navigationActions::navigateToPost,
             onImageClick = navigationActions::navigateToImage,
@@ -195,39 +161,37 @@ fun NavGraphBuilder.authorizedRoutes(navigationActions: NanoPostNavigationAction
         )
     }
 
-    composable(
-        route = NanoPostDestinations.ImageRoute,
-        arguments = listOf(
-            navArgument(IdArg) { type = NavType.StringType }
-        ),
-    ) { backStackEntry ->
-        ImageScreen(
-            imageId = backStackEntry.arguments!!.getString(IdArg)!!,
+    composable<ImageRoute> {
+        ImageRoute(
             onCloseClick = navigationActions::navigateUp,
         )
     }
 
-    composable(
-        route = NanoPostDestinations.PostRoute,
-        arguments = listOf(
-            navArgument(IdArg) { type = NavType.StringType }
-        ),
-    ) { backStackEntry ->
-        PostScreen(
-            postId = backStackEntry.arguments!!.getString(IdArg)!!,
+    composable<PostRoute> {
+        PostRoute(
             onCloseClick = navigationActions::navigateUp,
             onImageClick = navigationActions::navigateToImage,
             onProfileClick = navigationActions::navigateToProfile,
         )
     }
 
-    composable(NanoPostDestinations.CreatePostRoute) {
+    composable<CreatePostRoute>(
+        enterTransition = { fadeIn(animationSpec = tween(700)) },
+        exitTransition = { fadeOut(animationSpec = tween(700)) },
+        popEnterTransition = { fadeIn(animationSpec = tween(700)) },
+        popExitTransition = { fadeOut(animationSpec = tween(700)) },
+    ) {
         CreatePostScreen(
             onCloseClick = navigationActions::navigateUp,
         )
     }
 
-    composable(NanoPostDestinations.CreateProfileRoute) {
+    composable<CreateProfileRoute>(
+        enterTransition = { fadeIn(animationSpec = tween(700)) },
+        exitTransition = { fadeOut(animationSpec = tween(700)) },
+        popEnterTransition = { fadeIn(animationSpec = tween(700)) },
+        popExitTransition = { fadeOut(animationSpec = tween(700)) },
+    ) {
         CreateProfileScreen(
             onCloseClick = navigationActions::navigateUp,
         )

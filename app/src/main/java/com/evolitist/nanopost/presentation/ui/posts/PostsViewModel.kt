@@ -1,28 +1,26 @@
 package com.evolitist.nanopost.presentation.ui.posts
 
-import androidx.compose.runtime.Stable
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import androidx.paging.cachedIn
 import com.evolitist.nanopost.domain.usecase.GetPostsUseCase
+import com.evolitist.nanopost.presentation.extensions.filterData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-@Stable
 @HiltViewModel
 class PostsViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     getPostsUseCase: GetPostsUseCase,
 ) : ViewModel() {
 
-    private val profileIdFlow = MutableStateFlow<String?>(null)
+    private val profileId = savedStateHandle.toRoute<PostsRoute>().id
 
-    val postsPagingDataFlow = profileIdFlow
-        .flatMapLatest { getPostsUseCase(it) }
+    val postsPagingDataFlow = flow { emitAll(getPostsUseCase(profileId)) }
+        .filterData { !it.text.isNullOrBlank() || it.images.isNotEmpty() }
         .cachedIn(viewModelScope)
-
-    fun setProfileId(profileId: String?) {
-        profileIdFlow.value = profileId
-    }
 }

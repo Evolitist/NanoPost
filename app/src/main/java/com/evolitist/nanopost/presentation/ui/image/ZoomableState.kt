@@ -11,6 +11,7 @@ import androidx.compose.foundation.gestures.zoomBy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -27,13 +28,13 @@ import kotlin.math.roundToInt
 
 @Composable
 fun rememberZoomableState(): ZoomableState {
-    val zoom = rememberSaveable { mutableStateOf(1f) }
+    val zoom = rememberSaveable { mutableFloatStateOf(1f) }
     val offset = rememberSaveable(stateSaver = OffsetSaver) {
         mutableStateOf(Offset.Zero)
     }
 
     val transformableState = rememberTransformableState { zoomChange, panChange, _ ->
-        zoom.value = (zoom.value * zoomChange).coerceIn(1f, 3f)
+        zoom.floatValue = (zoom.floatValue * zoomChange).coerceIn(1f, 3f)
         offset.value += panChange
     }
 
@@ -52,34 +53,37 @@ fun Modifier.zoomable(
 ) = this.composed {
     val scope = rememberCoroutineScope()
 
-    Modifier.pointerInput(Unit) {
-        detectTransformGestures { centroid, pan, zoom, _ ->
-            scope.launch {
-                state.applyTransform(centroid, pan, zoom)
+    Modifier
+        .pointerInput(Unit) {
+            detectTransformGestures { centroid, pan, zoom, _ ->
+                scope.launch {
+                    state.applyTransform(centroid, pan, zoom)
+                }
             }
         }
-    }.pointerInput(Unit) {
-        detectTapGestures(
-            onTap = onTap?.let {
-                { it() }
-            },
-            onDoubleTap = {
-                scope.launch {
-                    state.animateTransform(
-                        centroid = it,
-                        pan = Offset.Zero,
-                        zoom = if (state.zoom.roundToInt() == 1) 3f else 1f.div(state.zoom),
-                    )
-                }
-            },
-        )
-    }.graphicsLayer {
-        translationX = -state.offset.x * state.zoom
-        translationY = -state.offset.y * state.zoom
-        scaleX = state.zoom
-        scaleY = state.zoom
-        transformOrigin = TransformOrigin(0f, 0f)
-    }
+        .pointerInput(Unit) {
+            detectTapGestures(
+                onTap = onTap?.let {
+                    { it() }
+                },
+                onDoubleTap = {
+                    scope.launch {
+                        state.animateTransform(
+                            centroid = it,
+                            pan = Offset.Zero,
+                            zoom = if (state.zoom.roundToInt() == 1) 3f else 1f.div(state.zoom),
+                        )
+                    }
+                },
+            )
+        }
+        .graphicsLayer {
+            translationX = -state.offset.x * state.zoom
+            translationY = -state.offset.y * state.zoom
+            scaleX = state.zoom
+            scaleY = state.zoom
+            transformOrigin = TransformOrigin(0f, 0f)
+        }
 }
 
 @Stable

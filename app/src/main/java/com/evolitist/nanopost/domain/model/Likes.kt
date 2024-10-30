@@ -6,4 +6,8 @@ import androidx.compose.runtime.Immutable
 data class Likes(
     val liked: Boolean,
     val likesCount: Int,
-)
+) {
+    companion object {
+        val Empty = Likes(false, 0)
+    }
+}

@@ -12,7 +12,7 @@ class UploadImageUseCase @Inject constructor(
 
     suspend operator fun invoke(
         contentUri: Uri,
-        progressCallback: (Float) -> Unit,
+        progressCallback: (Float?) -> Unit,
     ): Image {
         return imageRepository.putImage(
             prepareImageUseCase(contentUri),

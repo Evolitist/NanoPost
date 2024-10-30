@@ -1,5 +1,7 @@
 package com.evolitist.nanopost.presentation.service
 
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -25,6 +27,9 @@ class NotificationService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
+        if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            return
+        }
         message.notification?.let {
             val notification = NotificationCompat.Builder(this, POSTS_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)

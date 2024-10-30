@@ -3,7 +3,10 @@ package com.evolitist.nanopost.presentation.ui.view
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.dropUnlessStarted
 import com.evolitist.nanopost.domain.model.Post
 
 @Composable
@@ -14,16 +17,17 @@ fun PostCard(
     onHeaderClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val onClickState by rememberUpdatedState { onClick(post.id) }
+
     ElevatedCard(
         modifier = modifier.fillMaxWidth(),
-        onClick = { onClick(post.id) },
+        onClick = dropUnlessStarted { onClickState() },
     ) {
         PostContent(
             post = post,
             onImageClick = onImageClick,
             onHeaderClick = onHeaderClick,
             isStandalone = false,
-            modifier = Modifier.fillMaxWidth(),
         )
     }
 }

@@ -6,7 +6,8 @@ import kotlinx.serialization.Serializable
 data class ApiProfileCompact(
     val id: String,
     val username: String,
-    val displayName: String? = null,
-    val avatarUrl: String? = null,
+    val displayName: String?,
+    val avatarUrl: String?,
+    val avatarBlurHash: String?,
     val subscribed: Boolean = false,
 )

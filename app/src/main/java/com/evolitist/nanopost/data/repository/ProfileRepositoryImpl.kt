@@ -10,7 +10,7 @@ import com.evolitist.nanopost.domain.mapper.ProfileMapper
 import com.evolitist.nanopost.domain.model.ImageInfo
 import com.evolitist.nanopost.domain.model.Profile
 import com.evolitist.nanopost.domain.model.ProfileCompact
-import com.evolitist.nanopost.presentation.extensions.mapData
+import com.evolitist.nanopost.presentation.extensions.mapValues
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -29,7 +29,7 @@ class ProfileRepositoryImpl @Inject constructor(
         displayName: String?,
         bio: String?,
         avatar: ImageInfo?,
-        progressCallback: (Float) -> Unit,
+        progressCallback: (Float?) -> Unit,
     ): Profile {
         return apiService.putProfile(
             username = username,
@@ -45,7 +45,7 @@ class ProfileRepositoryImpl @Inject constructor(
             StringKeyedPagingSource { count, offset ->
                 apiService.getSubscribers(profileId, count, offset)
             }
-        }.flow.mapData(profileCompactMapper::fromApiToModel)
+        }.flow.mapValues(profileCompactMapper::fromApiToModel)
     }
 
     override suspend fun subscribe(profileId: String) {

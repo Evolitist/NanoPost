@@ -12,7 +12,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.DpOffset
 
 @Composable
 fun DropdownMenuIconButton(
@@ -33,7 +32,6 @@ fun DropdownMenuIconButton(
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            offset = DpOffset.Zero,
             content = content,
             modifier = menuModifier,
         )

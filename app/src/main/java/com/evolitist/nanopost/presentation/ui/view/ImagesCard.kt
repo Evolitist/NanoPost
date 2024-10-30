@@ -16,16 +16,24 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.evolitist.nanopost.R
 import com.evolitist.nanopost.domain.model.Image
+import com.evolitist.nanopost.domain.model.ImageSize
+import com.evolitist.nanopost.domain.model.ProfileCompact
+import com.wajahatiqbal.blurhash.BlurHashPainter
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun ImagesCard(
@@ -34,8 +42,11 @@ fun ImagesCard(
     onImageClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val onCardClickState by rememberUpdatedState(onCardClick)
+    val onImageClickState by rememberUpdatedState(onImageClick)
+
     ElevatedCard(
-        onClick = onCardClick,
+        onClick = onCardClickState,
         modifier = modifier,
     ) {
         Column(
@@ -71,14 +82,20 @@ fun ImagesCard(
                             .aspectRatio(1f),
                     ) {
                         images.getOrNull(it)?.let { image ->
+                            val smallestSize = image.sizes.minBy { it.width }
                             AsyncImage(
-                                image.sizes.last().url,
-                                contentDescription = null,
+                                model = image.sizes.last().url,
+                                contentDescription = image.contentDescription,
+                                placeholder = BlurHashPainter(
+                                    blurHash = image.blurHash,
+                                    width = smallestSize.width,
+                                    height = smallestSize.height,
+                                ),
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .clickable {
-                                        onImageClick(image.id)
+                                        onImageClickState(image.id)
                                     },
                             )
                         }
@@ -87,4 +104,27 @@ fun ImagesCard(
             }
         }
     }
+}
+
+@Preview
+@Composable
+private fun ImagesCard_Preview() {
+    val mockImages = List(4) {
+        Image(
+            id = it.toString(),
+            owner = ProfileCompact("", "username", null, null, null, false),
+            dateCreated = 0L,
+            contentDescription = null,
+            blurHash = null,
+            sizes = persistentListOf(
+                ImageSize(200, 200, "https://cataas.com/cat?type=square"),
+            ),
+        )
+    }.toImmutableList()
+    
+    ImagesCard(
+        images = mockImages,
+        onCardClick = {},
+        onImageClick = {},
+    )
 }

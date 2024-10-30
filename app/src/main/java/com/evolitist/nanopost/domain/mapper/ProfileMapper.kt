@@ -16,6 +16,7 @@ class ProfileMapper @Inject constructor(
         avatarId = api.avatarId,
         avatarLarge = api.avatarLarge,
         avatarSmall = api.avatarSmall,
+        avatarBlurHash = api.avatarBlurHash,
         subscribed = api.subscribed,
         subscribersCount = api.subscribersCount,
         postsCount = api.postsCount,

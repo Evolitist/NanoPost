@@ -12,7 +12,7 @@ class UploadPostUseCase @Inject constructor(
     suspend operator fun invoke(
         text: String?,
         images: List<ImageInfo>,
-        progressCallback: (Float) -> Unit = {},
+        progressCallback: (Float?) -> Unit = {},
     ): Post {
         return postRepository.putPost(
             text,

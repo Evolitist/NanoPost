@@ -8,5 +8,7 @@ data class Image(
     override val id: String,
     val owner: ProfileCompact,
     val dateCreated: Long,
+    val contentDescription: String?,
+    val blurHash: String?,
     val sizes: ImmutableList<ImageSize>,
 ) : Identifiable

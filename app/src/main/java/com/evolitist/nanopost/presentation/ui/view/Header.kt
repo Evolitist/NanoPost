@@ -11,7 +11,6 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -24,27 +23,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.evolitist.nanopost.domain.model.ProfileCompact
+import com.wajahatiqbal.blurhash.BlurHashPainter
 
-enum class HeaderStyle {
-    Profile,
-    Post,
-    Image,
-}
+private const val AvatarDefaultSize = 160
 
 @Composable
 fun Header(
     style: HeaderStyle,
     profile: ProfileCompact,
-    subtitle: @Composable () -> Unit,
+    subtitle: String,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
 ) {
-    val clickHandler by rememberUpdatedState(onClick)
+    val onClickState by rememberUpdatedState(onClick)
     val profileName = remember(profile) {
        profile.displayName ?: profile.username
     }
@@ -53,7 +50,8 @@ fun Header(
         leadingContent = {
             Avatar(
                 model = profile.avatarUrl,
-                monogram = {
+                blurHash = profile.avatarBlurHash,
+                content = {
                     Text(
                         text = profileName.take(1).uppercase(),
                         style = MaterialTheme.typography.titleMedium,
@@ -63,21 +61,28 @@ fun Header(
                 modifier = Modifier.size(style.avatarSize()),
             )
         },
-        headlineText = {
+        headlineContent = {
             Text(
                 text = profileName,
                 style = style.titleTextStyle(),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         },
-        supportingText = {
-            ProvideTextStyle(MaterialTheme.typography.bodySmall) {
-                subtitle()
-            }
+        supportingContent = {
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         },
         colors = ListItemDefaults.colors(containerColor = style.containerColor()),
-        modifier = modifier.clickable(enabled = onClick != null) {
-            clickHandler?.invoke()
-        },
+        modifier = modifier
+            .clickable(
+                enabled = onClick != null,
+                onClick = { onClickState?.invoke() },
+            ),
     )
 }
 
@@ -93,7 +98,8 @@ fun Avatar(
 
     Avatar(
         model = profile.avatarUrl,
-        monogram = {
+        blurHash = profile.avatarBlurHash,
+        content = {
             Text(
                 text = profileName.take(1).uppercase(),
                 style = MaterialTheme.typography.titleMedium,
@@ -107,7 +113,8 @@ fun Avatar(
 @Composable
 fun Avatar(
     model: String?,
-    monogram: @Composable () -> Unit,
+    blurHash: String?,
+    content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -123,14 +130,19 @@ fun Avatar(
             AsyncImage(
                 model = uri,
                 contentDescription = null,
+                placeholder = BlurHashPainter(
+                    blurHash = blurHash,
+                    width = AvatarDefaultSize,
+                    height = AvatarDefaultSize,
+                ),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
             )
         } else {
             CompositionLocalProvider(
-                LocalContentColor provides MaterialTheme.colorScheme.surface,
+                LocalContentColor provides MaterialTheme.colorScheme.inverseOnSurface,
             ) {
-                monogram()
+                content()
             }
         }
     }
@@ -159,7 +171,13 @@ private fun HeaderStyle.titleTextStyle() = when (this) {
 @Composable
 @ReadOnlyComposable
 private fun HeaderStyle.containerColor() = when (this) {
-    HeaderStyle.Profile -> MaterialTheme.colorScheme.surface
-    HeaderStyle.Post -> MaterialTheme.colorScheme.surface
+    HeaderStyle.Profile -> MaterialTheme.colorScheme.surfaceContainerLow
+    HeaderStyle.Post -> MaterialTheme.colorScheme.surfaceContainerLow
     HeaderStyle.Image -> Color.Transparent
+}
+
+enum class HeaderStyle {
+    Profile,
+    Post,
+    Image,
 }

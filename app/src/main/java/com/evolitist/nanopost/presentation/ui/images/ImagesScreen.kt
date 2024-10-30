@@ -6,65 +6,82 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.paging.LoadState
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import coil.compose.AsyncImage
+import androidx.paging.compose.itemKey
+import coil3.compose.AsyncImage
 import com.evolitist.nanopost.R
 import com.evolitist.nanopost.domain.model.Image
-import com.evolitist.nanopost.presentation.extensions.items
+import com.evolitist.nanopost.domain.model.ImageSize
+import com.evolitist.nanopost.domain.model.ProfileCompact
 import com.evolitist.nanopost.presentation.extensions.loadState
-import com.evolitist.nanopost.presentation.ui.view.insets.CenterAlignedTopAppBar
-import com.evolitist.nanopost.presentation.ui.view.insets.Scaffold
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.evolitist.nanopost.presentation.ui.view.PullRefreshBox
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.datetime.Clock
+import kotlinx.serialization.Serializable
+import kotlin.time.Duration.Companion.days
+
+@Serializable
+data class ImagesRoute(val id: String? = null)
 
 @Composable
-fun ImagesScreen(
+fun ImagesRoute(
+    modifier: Modifier = Modifier,
     viewModel: ImagesViewModel = hiltViewModel(),
-    profileId: String? = null,
     onCloseClick: () -> Unit,
     onImageClick: (String) -> Unit,
 ) {
-    val data = viewModel.imagesPagingDataFlow.collectAsLazyPagingItems()
-    val swipeRefreshState = rememberSwipeRefreshState(
-        data.loadState.refresh == LoadState.Loading
+    val images = viewModel.imagesPagingDataFlow.collectAsLazyPagingItems()
+
+    ImagesScreen(
+        images = images,
+        onCloseClick = onCloseClick,
+        onImageClick = onImageClick,
+        modifier = modifier,
     )
+}
 
-    LaunchedEffect(profileId) {
-        viewModel.setProfileId(profileId)
-    }
-
-    val topAppBarState = rememberTopAppBarState()
-    val scrollBehavior = remember(topAppBarState) {
-        TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
-    }
+@Composable
+fun ImagesScreen(
+    images: LazyPagingItems<Image>,
+    onCloseClick: () -> Unit,
+    onImageClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 navigationIcon = {
                     IconButton(
-                        content = { Icon(Icons.Rounded.ArrowBack, contentDescription = null) },
+                        content = {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                contentDescription = stringResource(R.string.action_back),
+                            )
+                        },
                         onClick = onCloseClick,
                     )
                 },
@@ -72,34 +89,35 @@ fun ImagesScreen(
                 scrollBehavior = scrollBehavior,
             )
         },
+        modifier = modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
     ) { padding ->
-        SwipeRefresh(
-            state = swipeRefreshState,
-            onRefresh = data::refresh,
-            modifier = Modifier.padding(padding),
+        PullRefreshBox(
+            data = images,
+            indicatorPadding = padding,
         ) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
                 verticalArrangement = Arrangement.spacedBy(2.dp),
                 horizontalArrangement = Arrangement.spacedBy(2.dp),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .nestedScroll(scrollBehavior.nestedScrollConnection),
+                contentPadding = padding,
+                modifier = Modifier.fillMaxSize(),
             ) {
                 items(
-                    items = data,
-                    key = Image::id,
-                ) { image ->
+                    count = images.itemCount,
+                    key = images.itemKey(Image::id),
+                ) { index ->
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth(1f)
+                            .fillMaxWidth()
                             .aspectRatio(1f),
                     ) {
-                        if (image != null) {
+                        images[index]?.let { image ->
                             AsyncImage(
                                 model = image.sizes.last().url,
                                 fallback = ColorPainter(MaterialTheme.colorScheme.surfaceVariant),
-                                contentDescription = null,
+                                contentDescription = image.contentDescription,
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -111,8 +129,33 @@ fun ImagesScreen(
                     }
                 }
 
-                loadState(data.loadState.append, data::retry)
+                loadState(images.loadState.append, images::retry)
             }
         }
     }
+}
+
+@Preview
+@Composable
+private fun ImagesScreen_Preview() {
+    val mockData = List(15) {
+        Image(
+            id = it.toString(),
+            owner = ProfileCompact("", "username", null, null, null, false),
+            dateCreated = Clock.System.now().minus(7.days).epochSeconds,
+            contentDescription = null,
+            blurHash = null,
+            sizes = persistentListOf(
+                ImageSize(200, 200, "https://cataas.com/cat?type=square")
+            ),
+        )
+    }
+    val pagingData = PagingData.from(mockData)
+    val mockDataFlow = MutableStateFlow(pagingData)
+
+    ImagesScreen(
+        images = mockDataFlow.collectAsLazyPagingItems(),
+        onCloseClick = {},
+        onImageClick = {},
+    )
 }

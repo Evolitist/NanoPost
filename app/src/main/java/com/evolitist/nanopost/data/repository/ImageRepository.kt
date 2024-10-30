@@ -9,7 +9,7 @@ interface ImageRepository {
 
     suspend fun putImage(
         imageInfo: ImageInfo,
-        progressCallback: (Float) -> Unit,
+        progressCallback: (Float?) -> Unit,
     ): Image
 
     suspend fun getImage(imageId: String): Image

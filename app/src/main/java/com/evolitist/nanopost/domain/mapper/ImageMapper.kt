@@ -13,6 +13,8 @@ class ImageMapper @Inject constructor(
         id = api.id,
         owner = api.owner.let(profileCompactMapper::fromApiToModel),
         dateCreated = api.dateCreated,
+        contentDescription = api.contentDescription,
+        blurHash = api.blurHash,
         sizes = api.sizes.map(imageSizeMapper::fromApiToModel).toImmutableList(),
     )
 }

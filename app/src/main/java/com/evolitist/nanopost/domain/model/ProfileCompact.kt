@@ -8,5 +8,6 @@ data class ProfileCompact(
     val username: String,
     val displayName: String?,
     val avatarUrl: String?,
+    val avatarBlurHash: String?,
     val subscribed: Boolean,
 ) : Identifiable

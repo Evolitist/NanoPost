@@ -7,9 +7,11 @@ import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
+import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.ForegroundInfo
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
@@ -42,6 +44,7 @@ class CreateProfileWorker @AssistedInject constructor(
             bio: String?,
             avatar: Uri?,
         ) = OneTimeWorkRequestBuilder<CreateProfileWorker>()
+            .setConstraints(Constraints(requiredNetworkType = NetworkType.CONNECTED))
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .setInputData(
                 Data.Builder()

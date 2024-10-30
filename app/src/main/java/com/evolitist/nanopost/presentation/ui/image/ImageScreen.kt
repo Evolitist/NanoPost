@@ -12,12 +12,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContent
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,8 +27,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,30 +36,50 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.evolitist.nanopost.R
 import com.evolitist.nanopost.domain.model.Image
 import com.evolitist.nanopost.presentation.ui.view.DropdownMenuIconButton
 import com.evolitist.nanopost.presentation.ui.view.Header
 import com.evolitist.nanopost.presentation.ui.view.HeaderStyle
-import com.evolitist.nanopost.presentation.ui.view.insets.CenterAlignedTopAppBar
-import java.text.SimpleDateFormat
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class ImageRoute(val id: String)
+
+@Composable
+fun ImageRoute(
+    onCloseClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: ImageViewModel = hiltViewModel(),
+) {
+    val image by viewModel.imageStateFlow.collectAsStateWithLifecycle()
+
+    ImageScreen(
+        image = image,
+        onCloseClick = onCloseClick,
+        onDeleteClick = viewModel::onDeleteClick,
+        modifier = modifier,
+    )
+}
 
 @Composable
 fun ImageScreen(
-    viewModel: ImageViewModel = hiltViewModel(),
-    imageId: String,
+    image: Image?,
     onCloseClick: () -> Unit,
+    onDeleteClick: (() -> Unit) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var showBars by remember { mutableStateOf(true) }
     val overlay = updateTransition(showBars, label = "Overlay transition")
-    val image by viewModel.imageStateFlow.collectAsState()
 
-    LaunchedEffect(imageId) {
-        viewModel.setImageId(imageId)
-    }
-
-    Surface {
+    Surface(
+        modifier = modifier.fillMaxSize(),
+    ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier.fillMaxSize(),
@@ -79,19 +98,34 @@ fun ImageScreen(
                 CenterAlignedTopAppBar(
                     navigationIcon = {
                         IconButton(
-                            content = { Icon(Icons.Rounded.ArrowBack, contentDescription = null) },
+                            content = {
+                                Icon(
+                                    imageVector = Icons.Rounded.Close,
+                                    contentDescription = stringResource(R.string.action_close),
+                                )
+                            },
                             onClick = onCloseClick,
                         )
                     },
                     title = {},
                     actions = {
                         DropdownMenuIconButton(
-                            icon = { Icon(Icons.Default.MoreVert, contentDescription = null) },
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = stringResource(R.string.action_menu),
+                                )
+                            },
                             content = {
                                 DropdownMenuItem(
-                                    leadingIcon = { Icon(Icons.Rounded.Delete, contentDescription = null) },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Delete,
+                                            contentDescription = stringResource(R.string.action_delete),
+                                        )
+                                    },
                                     text = { Text(stringResource(R.string.action_delete)) },
-                                    onClick = { viewModel.onDeleteClick(imageId, onCloseClick) },
+                                    onClick = { onDeleteClick(onCloseClick) },
                                 )
                             },
                         )
@@ -114,16 +148,18 @@ fun ImageScreen(
                             .fillMaxWidth()
                             .background(scrimColor)
                             .padding(top = 16.dp)
-                            .windowInsetsPadding(WindowInsets.safeContent.only(WindowInsetsSides.Bottom)),
+                            .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)),
                     ) {
                         val dateCreated = remember(it.dateCreated) {
-                            SimpleDateFormat.getDateTimeInstance().format(it.dateCreated)
+                            Instant.fromEpochSeconds(it.dateCreated)
+                                .toLocalDateTime(TimeZone.currentSystemDefault())
+                                .toString()
                         }
 
                         Header(
                             style = HeaderStyle.Image,
                             profile = it.owner,
-                            subtitle = { Text(dateCreated) },
+                            subtitle = dateCreated,
                         )
                     }
                 }
